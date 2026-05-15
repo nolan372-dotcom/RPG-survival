@@ -41,6 +41,9 @@ var _attack_hitbox_armed: bool = false
 var _parry_window_remaining: float = 0.0
 var _block_cooldown_remaining: float = 0.0
 var _hit_targets_this_swing: Array[Node] = []
+# Gating flag — set true while UI modes (e.g. building placement) consume
+# attack/ability inputs. The hero still moves and faces the mouse.
+var input_locked: bool = false
 
 # --- Node refs ----------------------------------------------------------------
 @onready var sprite: HeroSpriteController = $Sprite
@@ -134,6 +137,8 @@ func _handle_free_movement(delta: float) -> void:
 		_set_state(State.IDLE)
 
 func _check_action_inputs() -> void:
+	if input_locked:
+		return
 	if Input.is_action_just_pressed("attack"):
 		_enter_attack()
 	elif Input.is_action_just_pressed("ability") and _block_cooldown_remaining <= 0.0:

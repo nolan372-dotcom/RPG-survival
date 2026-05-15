@@ -13,13 +13,14 @@ config_version=5
 config/name="Crown & Wall"
 config/description="A single-player action-strategy game: explore, prepare, and endure three escalating Sieges."
 config/version="0.0.1"
-run/main_scene="res://scenes/test_arena.tscn"
+run/main_scene="res://scenes/castle_plot.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 ContentRegistry="*res://autoload/content_registry.gd"
+ResourceState="*res://autoload/resource_state.gd"
 
 [display]
 

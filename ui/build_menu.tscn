@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1crownwall7001"]
+
+[ext_resource type="Script" path="res://scripts/build_menu.gd" id="1_menu"]
+
+[node name="BuildMenu" type="Control"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -88.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.08, 0.08, 0.12, 0.85)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="FarmButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(140, 64)
+text = "Farm"
+
+[node name="WallButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(140, 64)
+text = "Wall"
+
+[node name="TowerButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(140, 64)
+text = "Archer Tower"

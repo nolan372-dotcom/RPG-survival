@@ -1,0 +1,140 @@
+[gd_scene load_steps=10 format=3 uid="uid://b1crownwall8001"]
+
+[ext_resource type="Script" path="res://scripts/castle_plot.gd" id="1_plot"]
+[ext_resource type="Script" path="res://scripts/grid_manager.gd" id="2_grid"]
+[ext_resource type="Script" path="res://scripts/build_placement.gd" id="3_place"]
+[ext_resource type="Script" path="res://scripts/threat_line_preview.gd" id="4_threat"]
+[ext_resource type="PackedScene" path="res://entities/hero.tscn" id="5_hero"]
+[ext_resource type="PackedScene" path="res://ui/build_menu.tscn" id="6_menu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_castle"]
+size = Vector2(128, 128)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_shrine"]
+radius = 12.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_spawn"]
+size = Vector2(20, 20)
+
+[node name="CastlePlot" type="Node2D"]
+script = ExtResource("1_plot")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_left = -2000.0
+offset_top = -2000.0
+offset_right = 2000.0
+offset_bottom = 2000.0
+color = Color(0.28, 0.42, 0.22, 1)
+
+[node name="Grid" type="Node2D" parent="."]
+position = Vector2(-480, -480)
+script = ExtResource("2_grid")
+grid_cols = 30
+grid_rows = 30
+
+[node name="GridOverlay" type="ColorRect" parent="Grid"]
+offset_right = 960.0
+offset_bottom = 960.0
+color = Color(0.4, 0.55, 0.3, 1)
+
+[node name="PrePlaced" type="Node2D" parent="Grid"]
+
+[node name="Castle" type="StaticBody2D" parent="Grid/PrePlaced"]
+position = Vector2(416, 416)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Visual" type="ColorRect" parent="Grid/PrePlaced/Castle"]
+offset_right = 128.0
+offset_bottom = 128.0
+color = Color(0.25, 0.2, 0.18, 1)
+
+[node name="Label" type="Label" parent="Grid/PrePlaced/Castle/Visual"]
+offset_right = 128.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(0.95, 0.92, 0.8, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Castle"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Grid/PrePlaced/Castle"]
+position = Vector2(64, 64)
+shape = SubResource("RectangleShape2D_castle")
+
+[node name="Shrine" type="Node2D" parent="Grid/PrePlaced"]
+position = Vector2(560, 472)
+
+[node name="ShrineVisual" type="ColorRect" parent="Grid/PrePlaced/Shrine"]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(0.9, 0.85, 0.5, 1)
+
+[node name="Label" type="Label" parent="Grid/PrePlaced/Shrine/ShrineVisual"]
+offset_left = -28.0
+offset_top = -28.0
+offset_right = 52.0
+offset_bottom = -10.0
+theme_override_colors/font_color = Color(0.9, 0.85, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+text = "Shrine"
+horizontal_alignment = 1
+
+[node name="SpawnMarkers" type="Node2D" parent="Grid"]
+
+[node name="SpawnW" type="Sprite2D" parent="Grid/SpawnMarkers"]
+modulate = Color(1, 0.5, 0.5, 1)
+position = Vector2(160, 16)
+texture = SubResource("PlaceholderTexture2D_spawn")
+
+[node name="SpawnC" type="Sprite2D" parent="Grid/SpawnMarkers"]
+modulate = Color(1, 0.5, 0.5, 1)
+position = Vector2(480, 16)
+texture = SubResource("PlaceholderTexture2D_spawn")
+
+[node name="SpawnE" type="Sprite2D" parent="Grid/SpawnMarkers"]
+modulate = Color(1, 0.5, 0.5, 1)
+position = Vector2(800, 16)
+texture = SubResource("PlaceholderTexture2D_spawn")
+
+[node name="Buildings" type="Node2D" parent="Grid"]
+
+[node name="ThreatLinePreview" type="Node2D" parent="Grid"]
+script = ExtResource("4_threat")
+
+[node name="BuildPlacement" type="Node2D" parent="Grid"]
+script = ExtResource("3_place")
+hero_path = NodePath("../../Hero")
+
+[node name="Hero" parent="." instance=ExtResource("5_hero")]
+position = Vector2(0, 220)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ResourceLabel" type="Label" parent="UI"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 600.0
+offset_bottom = 40.0
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Wood: 200    Food: 100    Gold: 100"
+
+[node name="Instructions" type="Label" parent="UI"]
+offset_left = 12.0
+offset_top = 44.0
+offset_right = 900.0
+offset_bottom = 120.0
+theme_override_colors/font_color = Color(0.85, 0.9, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Castle Plot — C8 prototype
+WASD: walk    Build menu (bottom): click to start placing    LMB: confirm    R: rotate    ESC: cancel
+F8: switch to combat test arena"
+
+[node name="BuildMenu" parent="UI" instance=ExtResource("6_menu")]
