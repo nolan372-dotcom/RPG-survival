@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="HeirloomData" load_steps=2 format=3 uid="uid://b1crownwall1008"]
+
+[ext_resource type="Script" path="res://scripts/data/heirloom_data.gd" id="1_heirloom"]
+
+[resource]
+script = ExtResource("1_heirloom")
+id = &"soldiers_resolve"
+display_name = "Soldier's Resolve"
+class_restriction = 0
+rarity = 0
+effect_modifiers = {
+"block_strength_mult": 1.10
+}
+effect_summary = "+10% block strength."
+lore_text = "Worn smooth where a thousand thumbs have braced before yours."

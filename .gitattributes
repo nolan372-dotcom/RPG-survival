@@ -1,0 +1,41 @@
+# Force LF line endings for source/text files
+*.gd          text eol=lf
+*.tres        text eol=lf
+*.tscn        text eol=lf
+*.cfg         text eol=lf
+*.godot       text eol=lf
+*.md          text eol=lf
+*.json        text eol=lf
+*.gitattributes text eol=lf
+*.gitignore   text eol=lf
+
+# Binary art assets via Git LFS
+*.png         filter=lfs diff=lfs merge=lfs -text
+*.jpg         filter=lfs diff=lfs merge=lfs -text
+*.jpeg        filter=lfs diff=lfs merge=lfs -text
+*.gif         filter=lfs diff=lfs merge=lfs -text
+*.bmp         filter=lfs diff=lfs merge=lfs -text
+*.tga         filter=lfs diff=lfs merge=lfs -text
+*.aseprite    filter=lfs diff=lfs merge=lfs -text
+*.ase         filter=lfs diff=lfs merge=lfs -text
+*.psd         filter=lfs diff=lfs merge=lfs -text
+*.kra         filter=lfs diff=lfs merge=lfs -text
+
+# Audio via Git LFS
+*.wav         filter=lfs diff=lfs merge=lfs -text
+*.ogg         filter=lfs diff=lfs merge=lfs -text
+*.mp3         filter=lfs diff=lfs merge=lfs -text
+*.flac        filter=lfs diff=lfs merge=lfs -text
+
+# Fonts via Git LFS
+*.ttf         filter=lfs diff=lfs merge=lfs -text
+*.otf         filter=lfs diff=lfs merge=lfs -text
+
+# Models / video (in case we add any)
+*.glb         filter=lfs diff=lfs merge=lfs -text
+*.gltf        filter=lfs diff=lfs merge=lfs -text
+*.mp4         filter=lfs diff=lfs merge=lfs -text
+*.webm        filter=lfs diff=lfs merge=lfs -text
+
+# Note: icon.svg deliberately NOT LFS — small, useful to diff
+*.svg         text eol=lf

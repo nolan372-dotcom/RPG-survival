@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="WaveData" load_steps=2 format=3 uid="uid://b1crownwall1007"]
+
+[ext_resource type="Script" path="res://scripts/data/wave_data.gd" id="1_wave"]
+
+[resource]
+script = ExtResource("1_wave")
+id = &"siege1_wave1"
+display_name = "Siege I — Wave 1"
+enemy_counts = Array[int]([8])
+spawn_cadence = 1.2
+spawn_lanes = PackedInt32Array(0)
+duration = 45.0
+is_boss_wave = false

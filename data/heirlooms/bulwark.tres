@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="HeirloomData" load_steps=2 format=3 uid="uid://b1crownwall1009"]
+
+[ext_resource type="Script" path="res://scripts/data/heirloom_data.gd" id="1_heirloom"]
+
+[resource]
+script = ExtResource("1_heirloom")
+id = &"bulwark"
+display_name = "Bulwark"
+class_restriction = 0
+rarity = 1
+effect_modifiers = {
+"block_stamina_cost": 0.0
+}
+effect_summary = "Block consumes 0 stamina."
+lore_text = "Bound in iron, the buckler does not ask, only endures."

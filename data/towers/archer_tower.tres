@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3 uid="uid://b1crownwall1004"]
+
+[ext_resource type="Script" path="res://scripts/data/tower_data.gd" id="1_tower"]
+
+[resource]
+script = ExtResource("1_tower")
+id = &"archer_tower"
+display_name = "Archer Tower"
+footprint_x = 1
+footprint_y = 1
+cost_wood = 30
+cost_food = 0
+cost_gold = 0
+hp = 120
+function_type = 2
+description = "Auto-fires arrows at the nearest enemy in range."
+damage = 8
+range = 200.0
+fire_rate = 1.5
+targeting_rule = 0
+aoe_radius = 0.0
+slow_modifier = 0.0

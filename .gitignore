@@ -1,0 +1,36 @@
+# Godot 4+
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+
+# Mono/C# (in case it gets added later)
+.mono/
+data_*/
+
+# Imported translations (auto-generated)
+*.translation
+
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# IDE / tooling
+.vscode/
+.idea/
+.claude/
+
+# Build outputs
+build/
+dist/
+*.exe
+*.pck
+*.zip
+
+# User-local mods (shipped in user://, not repo)
+user_mods/
+
+# Logs / crash dumps
+*.log
+logs/

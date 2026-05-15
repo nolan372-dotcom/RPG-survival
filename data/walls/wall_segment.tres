@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WallData" load_steps=2 format=3 uid="uid://b1crownwall1003"]
+
+[ext_resource type="Script" path="res://scripts/data/wall_data.gd" id="1_wall"]
+
+[resource]
+script = ExtResource("1_wall")
+id = &"wall_segment"
+display_name = "Wall Segment"
+footprint_x = 1
+footprint_y = 1
+cost_wood = 10
+cost_food = 0
+cost_gold = 0
+hp = 100
+function_type = 2
+description = "Cheap dedicated damage soaker. The intended sacrificial layer."
+double_damage_from_curse = false
+connects_to_neighbors = true
