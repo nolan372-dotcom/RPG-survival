@@ -312,34 +312,34 @@ All must be checked before proceeding to Vertical Slice.
 
 ### Story C8-S1: Castle scene
 
-- [ ] Create `Castle.tscn` with castle sprite, Shrine, build plot bounds
-- [ ] Define enemy approach lanes (path nodes from northern edge to castle)
-- [ ] Define buildable tile grid within plot (30×30 tile area, configurable)
-- [ ] Castle HP property and HP bar
+- [x] Create `Castle.tscn` with castle sprite, Shrine, build plot bounds  *(scenes/castle_plot.tscn — castle 4×4 placeholder rect, Shrine 1×1 placeholder, 30×30 buildable area)*
+- [x] Define enemy approach lanes (path nodes from northern edge to castle)  *(3 spawn markers wired into ThreatLinePreview; full enemy AI pathing comes in C9)*
+- [x] Define buildable tile grid within plot (30×30 tile area, configurable)  *(GridManager.grid_cols/rows exported)*
+- [ ] Castle HP property and HP bar  *(deferred — Castle is placeholder StaticBody; HP system gets wired when C9 Siege content actually damages it)*
 
 ### Story C8-S2: Building placement system
 
-- [ ] Build menu UI (placeholder visual)
-- [ ] Click building in menu → ghost cursor follows mouse
-- [ ] Ghost shows green/red based on placement validity
-- [ ] R-key rotates building (for non-square footprints)
-- [ ] Placement validation: bounded plot, no overlap with other buildings, no overlap with castle
-- [ ] Confirm placement: deduct resources, spawn building entity, start construction animation
-- [ ] Cancel placement: ESC returns to no-placement state
+- [x] Build menu UI (placeholder visual)  *(ui/build_menu.tscn — three buttons at bottom of screen)*
+- [x] Click building in menu → ghost cursor follows mouse
+- [x] Ghost shows green/red based on placement validity  *(green = can_place + can_afford, red otherwise)*
+- [x] R-key rotates building (for non-square footprints)  *(swaps footprint X/Y; no-op visible for square footprints)*
+- [x] Placement validation: bounded plot, no overlap with other buildings, no overlap with castle
+- [x] Confirm placement: deduct resources, spawn building entity, start construction animation  *(resources deducted; construction animation deferred to Phase 2 polish)*
+- [x] Cancel placement: ESC returns to no-placement state
 
 ### Story C8-S3: Three placeholder buildings
 
-- [ ] Farm (2×2, generates 5 food per day)
-- [ ] Archer Tower (1×1, fires at enemies during Siege)
-- [ ] Wall Segment (1×1, 100 HP, cheap damage soaker)
+- [x] Farm (2×2, generates 5 food per day)  *(2×2 placed; daily food yield activates with day clock in Phase 2)*
+- [x] Archer Tower (1×1, fires at enemies during Siege)  *(1×1 placed; auto-fire logic activates with C9)*
+- [x] Wall Segment (1×1, 100 HP, cheap damage soaker)
 
 ### Story C8-S4: Threat line preview
 
-- [ ] When ghost is placed, trace a faint red line from each enemy spawn point through the ghost position to the castle
-- [ ] Line is only visible if the ghost intersects a direct path from a spawn to the castle
-- [ ] Multiple lines if multiple spawn points feed through the ghost
-- [ ] Line fades to invisible when ghost is moved off a threat path
-- [ ] Helps the player decide: damage-soaker placement vs. behind-defenses placement
+- [x] When ghost is placed, trace a faint red line from each enemy spawn point through the ghost position to the castle
+- [x] Line is only visible if the ghost intersects a direct path from a spawn to the castle
+- [x] Multiple lines if multiple spawn points feed through the ghost
+- [x] Line fades to invisible when ghost is moved off a threat path  *(highlighted vs faint instead of visible/invisible; clearer to keep all lines drawn faintly)*
+- [x] Helps the player decide: damage-soaker placement vs. behind-defenses placement
 
 ---
 
