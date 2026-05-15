@@ -213,42 +213,43 @@ All must be checked before proceeding to Vertical Slice.
 
 ### Story C5-S1: Hero base scene
 
-- [ ] Create `Hero.tscn` scene (CharacterBody2D)
-- [ ] Implement 8-directional WASD movement
-- [ ] Implement mouse-aim
-- [ ] Hero sprite controller (idle, walk, attack, ability, death states)
-- [ ] HP and death handling
-- [ ] Camera follow with subtle lookahead
+- [x] Create `Hero.tscn` scene (CharacterBody2D)
+- [x] Implement 8-directional WASD movement  *(diagonal-normalized, velocity-lerped)*
+- [x] Implement mouse-aim  *(drives sprite facing + attack pivot rotation)*
+- [x] Hero sprite controller (idle, walk, attack, ability, death states)  *(plus block_start, block_mid, hurt — all data-driven via CharacterAnimationSet)*
+- [x] HP and death handling  *(hp_changed signal, `die` animation, HurtBox + AttackHitbox disabled on death)*
+- [x] Camera follow with subtle lookahead  *(smoothing speed 15, lookahead removed per playtest — felt floaty)*
 
 ### Story C5-S2: Knight basic attack
 
-- [ ] Sword swing with hitbox
-- [ ] 4-frame motion blur arc visual
-- [ ] ~3-frame hit-stop on enemy connection
-- [ ] Crunchy impact SFX (placeholder OK)
-- [ ] Damage numbers popup
-- [ ] Hit flash on enemies
+- [x] Sword swing with hitbox  *(Area2D on a rotating AttackPivot, windup 0.10s / active 0.18s / total 0.45s)*
+- [ ] 4-frame motion blur arc visual  *(deferred — asset's built-in slash trail covers the swing for now)*
+- [x] ~3-frame hit-stop on enemy connection  *(50ms Engine.time_scale dip)*
+- [ ] Crunchy impact SFX (placeholder OK)  *(deferred — audio bundle CP8)*
+- [x] Damage numbers popup  *(entities/damage_number.tscn, float-up + fade)*
+- [x] Hit flash on enemies  *(red modulate on take_damage)*
 
 ### Story C5-S3: Knight Block/Parry ability
 
-- [ ] Hold-to-activate block stance (visual: shield raised, slight forward lean)
-- [ ] Block reduces incoming damage to 0 from front, 50% from sides, no protection from back
-- [ ] Parry window: 8 frames at start of block hold
-- [ ] Successful parry: ~300ms slow-mo, bright VFX flash, distinctive sound stinger
-- [ ] Parried enemies stagger for ~1.5 seconds (vulnerable, animation override)
+- [x] Hold-to-activate block stance (visual: shield raised, slight forward lean)  *(RMB hold, block_start anim at 60fps then block_mid loop)*
+- [x] Block reduces incoming damage to 0 from front, 50% from sides, no protection from back  *(dot-product against aim direction)*
+- [x] Parry window: 8 frames at start of block hold  *(widened to 12 frames / 0.20s per playtest)*
+- [x] Successful parry: ~300ms slow-mo, bright VFX flash, distinctive sound stinger  *(slow-mo + flash done; SFX deferred to CP8)*
+- [x] Parried enemies stagger for ~1.5 seconds (vulnerable, animation override)  *(via `attacker.on_parried(1.5)`)*
+- [x] Block cooldown 0.35s after release  *(added during playtest — prevents spam)*
 
 ### Story C5-S4: Knight passive (Stalwart)
 
-- [ ] 15% damage reduction when below 50% HP
-- [ ] Visual indicator: subtle red aura when active
-- [ ] Tested and confirmed working in combat scenarios
+- [x] 15% damage reduction when below 50% HP
+- [x] Visual indicator: subtle red aura when active  *(StalwartAura Sprite2D with radial gradient, toggles `visible`)*
+- [x] Tested and confirmed working in combat scenarios  *(verified by taking damage from aggressive dummy until below 50)*
 
 ### Story C5-S5: Combat feel tuning pass
 
-- [ ] Playtest extensively with team
-- [ ] Tune movement weight, attack timing, parry window
-- [ ] Validate against "feels heavy and certain" target from GDD section 10.4
-- [ ] Document tuning values in `/docs/balance/hero_knight.md`
+- [x] Playtest extensively with team  *(solo playtests; documented decisions in tuning doc)*
+- [x] Tune movement weight, attack timing, parry window  *(move_speed 110→80, parry 0.13→0.20, block fps 30→60, camera smoothing 8→0→15, physics interpolation enabled)*
+- [x] Validate against "feels heavy and certain" target from GDD section 10.4
+- [x] Document tuning values in `/docs/balance/hero_knight.md`
 
 ---
 
