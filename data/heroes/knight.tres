@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="HeroData" load_steps=2 format=3 uid="uid://b1crownwall1001"]
+[gd_resource type="Resource" script_class="HeroData" load_steps=3 format=3 uid="uid://b1crownwall1001"]
 
 [ext_resource type="Script" path="res://scripts/data/hero_data.gd" id="1_hero"]
+[ext_resource type="Resource" path="res://art/characters/knight/knight_animations.tres" id="2_anim_set"]
 
 [resource]
 script = ExtResource("1_hero")
@@ -12,4 +13,5 @@ base_damage = 12
 move_speed = 110.0
 ability_id = &"block_parry"
 passive_id = &"stalwart"
+animation_set = ExtResource("2_anim_set")
 lore = "Heir to the crown, bound by oath to the wall."

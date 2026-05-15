@@ -9,5 +9,5 @@ extends Resource
 @export var move_speed: float = 120.0
 @export var ability_id: StringName
 @export var passive_id: StringName
-@export var sprite_frames: SpriteFrames
+@export var animation_set: Resource  # CharacterAnimationSet
 @export_multiline var lore: String = ""

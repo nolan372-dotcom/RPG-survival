@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="CharacterAnimationSet" load_steps=10 format=3 uid="uid://b1crownwall2001"]
+
+[ext_resource type="Script" path="res://scripts/data/character_animation_set.gd" id="1_anim_set"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/Idle_Shadowless.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/Walk_Shadowless.png" id="3_walk"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/Run_Shadowless.png" id="4_run"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/Melee_Shadowless.png" id="5_melee"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/ShieldBlockStart_Shadowless.png" id="6_block_start"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/ShieldBlockMid_Shadowless.png" id="7_block_mid"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/TakeDamage_Shadowless.png" id="8_hurt"]
+[ext_resource type="Texture2D" path="res://art/characters/knight/Die_Shadowless.png" id="9_die"]
+
+[resource]
+script = ExtResource("1_anim_set")
+frame_size = Vector2i(64, 64)
+direction_count = 8
+sheets = {
+&"idle": ExtResource("2_idle"),
+&"walk": ExtResource("3_walk"),
+&"run": ExtResource("4_run"),
+&"melee": ExtResource("5_melee"),
+&"block_start": ExtResource("6_block_start"),
+&"block_mid": ExtResource("7_block_mid"),
+&"hurt": ExtResource("8_hurt"),
+&"die": ExtResource("9_die")
+}
+metadata = {
+&"idle": {"frame_count": 15, "fps": 12.0, "loop": true},
+&"walk": {"frame_count": 15, "fps": 14.0, "loop": true},
+&"run": {"frame_count": 15, "fps": 18.0, "loop": true},
+&"melee": {"frame_count": 15, "fps": 24.0, "loop": false},
+&"block_start": {"frame_count": 15, "fps": 30.0, "loop": false},
+&"block_mid": {"frame_count": 15, "fps": 10.0, "loop": true},
+&"hurt": {"frame_count": 15, "fps": 24.0, "loop": false},
+&"die": {"frame_count": 15, "fps": 14.0, "loop": false}
+}
