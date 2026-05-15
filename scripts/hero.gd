@@ -22,7 +22,7 @@ signal died
 const ATTACK_HITBOX_DURATION: float = 0.18  # how long the hitbox is live during an attack
 const ATTACK_HITBOX_DELAY: float = 0.10     # delay before the hitbox activates (windup)
 const ATTACK_TOTAL_DURATION: float = 0.45   # total attack lockout duration
-const PARRY_WINDOW: float = 0.13            # 8 frames at 60fps — also the BLOCK_START duration
+const PARRY_WINDOW: float = 0.20            # 12 frames at 60fps — also the BLOCK_START duration
 const BLOCK_START_DURATION: float = PARRY_WINDOW
 const BLOCK_COOLDOWN: float = 0.35          # after exiting block, can't block again for this long
 const HURT_LOCKOUT: float = 0.20
