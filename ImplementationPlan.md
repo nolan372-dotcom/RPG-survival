@@ -78,9 +78,9 @@ All must be checked before proceeding to Vertical Slice.
 
 ### Story C1-S3: Decision log
 
-- [ ] Create `/docs/decisions.md`
-- [ ] Establish convention: every meaningful design or scope change logged here with date, decision, rationale
-- [ ] First entry: "v1.0 vision locked, replacing v0.2 rogue-like tower defense direction"
+- [x] Create `/docs/decisions.md`
+- [x] Establish convention: every meaningful design or scope change logged here with date, decision, rationale
+- [x] First entry: "v1.0 vision locked, replacing v0.2 rogue-like tower defense direction"  *(plus entries for solo-dev workflow, engine choice, git remote plan)*
 
 ---
 
@@ -88,11 +88,11 @@ All must be checked before proceeding to Vertical Slice.
 
 ### Story C2-S1: Repository
 
-- [ ] Create Git repository  *(deferred — need to choose remote: GitHub / GitLab / local-only)*
+- [x] Create Git repository  *(local `main`, commit `66c3f89` is the scaffold; GitHub remote pending user creating the repo on github.com)*
 - [x] Add `.gitignore` for Godot
-- [ ] Set up Git LFS, tracking `.png`, `.jpg`, `.aseprite`, `.wav`, `.ogg`, `.mp3`, `.ttf`, `.psd`
+- [x] Set up Git LFS, tracking `.png`, `.jpg`, `.aseprite`, `.wav`, `.ogg`, `.mp3`, `.ttf`, `.psd`  *(also `.psd .kra .tga .bmp .gif .flac .otf .glb .gltf .mp4 .webm`)*
 - [x] Write `README.md` with project overview, setup steps, branch strategy  *(branch strategy section TBD when remote is chosen)*
-- [ ] Verify a binary asset commit round-trips correctly
+- [ ] Verify a binary asset commit round-trips correctly  *(pending Craftpix asset import)*
 
 ### Story C2-S2: Godot project
 
@@ -102,7 +102,7 @@ All must be checked before proceeding to Vertical Slice.
 - [x] Enable pixel snap
 - [x] Set renderer to Forward+
 - [x] Configure project folder structure: `/autoload`, `/data`, `/entities`, `/scenes`, `/scripts`, `/ui`, `/art`, `/audio`, `/maps`, `/addons`, `/docs`
-- [ ] Verify project exports cleanly to Windows, Mac, and Linux  *(requires export templates install)*
+- [ ] Verify project exports cleanly to Windows, Mac, and Linux  *(Windows ✓ — `.exe` builds and ContentRegistry loads 9 resources at runtime. Mac/Linux deferred — need access to those OSes.)*
 
 ### Story C2-S3: CI
 

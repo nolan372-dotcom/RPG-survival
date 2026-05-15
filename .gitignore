@@ -1,8 +1,7 @@
 # Godot 4+
 .godot/
 .import/
-export.cfg
-export_presets.cfg
+# Note: export_presets.cfg IS committed — it's the build recipe.
 
 # Mono/C# (in case it gets added later)
 .mono/

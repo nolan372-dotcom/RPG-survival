@@ -109,26 +109,41 @@ func _scan_dir(path: String, category_key: String, expected_type_name: String, i
 	if not DirAccess.dir_exists_absolute(path):
 		return 0
 	var loaded: int = 0
+	var loaded_paths: Dictionary = {}  # canonical path -> true (dedupe .tres and .tres.remap for same resource)
 	for entry in _list_files_recursive(path):
-		if not (entry.ends_with(".tres") or entry.ends_with(".res")):
+		var load_path: String = _resolve_loadable_path(entry)
+		if load_path == "" or loaded_paths.has(load_path):
 			continue
-		var res: Resource = load(entry)
+		var res: Resource = load(load_path)
 		if res == null:
-			push_warning("ContentRegistry: failed to load %s" % entry)
+			push_warning("ContentRegistry: failed to load %s" % load_path)
 			continue
-		if not (res is Resource) or not "id" in res:
-			push_warning("ContentRegistry: %s has no `id` property, skipping" % entry)
+		if not "id" in res:
+			push_warning("ContentRegistry: %s has no `id` property, skipping" % load_path)
 			continue
 		var rid: StringName = res.get("id")
 		if rid == &"":
-			push_warning("ContentRegistry: %s has empty id, skipping" % entry)
+			push_warning("ContentRegistry: %s has empty id, skipping" % load_path)
 			continue
 		var bucket: Dictionary = _registry[category_key]
 		if is_mod and bucket.has(rid):
-			push_warning("ContentRegistry: mod resource %s overrides shipped %s/%s" % [entry, category_key, String(rid)])
+			push_warning("ContentRegistry: mod resource %s overrides shipped %s/%s" % [load_path, category_key, String(rid)])
 		bucket[rid] = res
+		loaded_paths[load_path] = true
 		loaded += 1
 	return loaded
+
+# In editor builds the directory scan returns .tres / .res files directly.
+# In exported builds the same resources show up as .tres.remap / .res.remap pointing at binary blobs.
+# Map both forms to a load() path that Godot understands; ignore unrelated files.
+func _resolve_loadable_path(entry: String) -> String:
+	if entry.ends_with(".tres") or entry.ends_with(".res"):
+		return entry
+	if entry.ends_with(".tres.remap"):
+		return entry.substr(0, entry.length() - ".remap".length())
+	if entry.ends_with(".res.remap"):
+		return entry.substr(0, entry.length() - ".remap".length())
+	return ""
 
 func _list_files_recursive(path: String) -> PackedStringArray:
 	var results: PackedStringArray = []
