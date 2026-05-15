@@ -48,3 +48,13 @@ theme_override_colors/font_color = Color(1, 0.95, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "HP: 100 / 100"
+
+[node name="DebugLabel" type="Label" parent="UI"]
+offset_left = 12.0
+offset_top = 130.0
+offset_right = 800.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(0.65, 0.85, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "facing: ?    state: ?    aim: (0, 0)"

@@ -8,6 +8,7 @@ extends Node2D
 @onready var dummy_container: Node2D = $Dummies
 @onready var instructions: Label = $UI/Instructions
 @onready var hp_label: Label = $UI/HPLabel
+@onready var debug_label: Label = $UI/DebugLabel
 
 const DUMMY_SCENE: PackedScene = preload("res://entities/test_dummy.tscn")
 
@@ -45,3 +46,13 @@ func _clear_dummies() -> void:
 func _on_hp_changed(current: int, max_hp: int) -> void:
 	if hp_label != null:
 		hp_label.text = "HP: %d / %d" % [current, max_hp]
+
+func _process(_delta: float) -> void:
+	if debug_label == null or hero == null or not is_instance_valid(hero):
+		return
+	var aim: Vector2 = hero.current_aim_dir()
+	debug_label.text = "facing: %s    state: %s    aim: (%.0f, %.0f)" % [
+		String(hero.current_facing_name()),
+		String(hero.current_state_name()),
+		aim.x, aim.y
+	]

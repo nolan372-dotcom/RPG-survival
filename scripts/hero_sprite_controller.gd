@@ -43,6 +43,14 @@ func _build_sprite_frames() -> void:
 	var frames := SpriteFrames.new()
 	frames.remove_animation(&"default")  # SpriteFrames ships with a default we don't want
 
+	# Build a lookup from direction suffix -> actual sheet row index.
+	# E.g. if the sheet rows are N, NE, E, SE, S, SW, W, NW (CW from N), then
+	# direction_row_order = [n, ne, e, se, s, sw, w, nw] and "w" maps to row 6.
+	var suffix_to_row: Dictionary = {}
+	var row_order: Array = animation_set.direction_row_order
+	for row_index in row_order.size():
+		suffix_to_row[row_order[row_index]] = row_index
+
 	for anim_name in animation_set.animation_names():
 		var sheet: Texture2D = animation_set.get_sheet(anim_name)
 		if sheet == null:
@@ -50,18 +58,17 @@ func _build_sprite_frames() -> void:
 		var frame_count: int = animation_set.get_frame_count(anim_name)
 		var fps: float = animation_set.get_fps(anim_name)
 		var loop: bool = animation_set.is_looping(anim_name)
-		var dir_count: int = _direction_suffixes.size()
 
-		for dir_index in dir_count:
-			var combined: StringName = "%s_%s" % [String(anim_name), _direction_suffixes[dir_index]]
+		for suffix in _direction_suffixes:
+			var combined: StringName = "%s_%s" % [String(anim_name), suffix]
 			frames.add_animation(combined)
 			frames.set_animation_speed(combined, fps)
 			frames.set_animation_loop(combined, loop)
-
+			var row_index: int = int(suffix_to_row.get(suffix, _direction_suffixes.find(suffix)))
 			for frame_index in frame_count:
 				var atlas := AtlasTexture.new()
 				atlas.atlas = sheet
-				atlas.region = Rect2(frame_index * _frame_size.x, dir_index * _frame_size.y, _frame_size.x, _frame_size.y)
+				atlas.region = Rect2(frame_index * _frame_size.x, row_index * _frame_size.y, _frame_size.x, _frame_size.y)
 				frames.add_frame(combined, atlas)
 
 	sprite_frames = frames
@@ -90,12 +97,21 @@ func current_state() -> StringName:
 func direction_index() -> int:
 	return _current_direction_index
 
+func direction_name() -> StringName:
+	if _current_direction_index < 0 or _current_direction_index >= _direction_suffixes.size():
+		return &"?"
+	return _direction_suffixes[_current_direction_index]
+
 func _refresh_play() -> void:
 	if sprite_frames == null:
 		return
 	var combined: StringName = "%s_%s" % [String(_current_state), _direction_suffixes[_current_direction_index]]
 	if not sprite_frames.has_animation(combined):
 		push_warning("HeroSpriteController: missing animation %s" % combined)
+		return
+	# Don't restart the animation if we're already playing this exact combined animation.
+	# Otherwise direction-only changes (mouse jitter) would freeze the animation at frame 0.
+	if animation == combined and is_playing():
 		return
 	play(combined)
 

@@ -112,7 +112,6 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector2.ZERO
 
 	_update_stalwart_aura()
-	_update_camera_lookahead()
 
 # --- Movement / input ---------------------------------------------------------
 
@@ -287,9 +286,16 @@ func _update_stalwart_aura() -> void:
 	stalwart_aura.visible = _stalwart_active() and state != State.DEAD
 
 # --- Camera -------------------------------------------------------------------
+# Camera tracks the hero strictly — no smoothing, no mouse-aim lookahead.
+# Re-enable position_smoothing_enabled in hero.tscn if you want drift back.
 
-func _update_camera_lookahead() -> void:
-	# Pull the camera slightly toward where the player is aiming.
-	var aim_dir: Vector2 = get_global_mouse_position() - global_position
-	var clamped: Vector2 = aim_dir.limit_length(80.0)
-	camera.offset = camera.offset.lerp(clamped * 0.4, 0.08)
+# --- Public accessors (for debug / UI) ---------------------------------------
+
+func current_facing_name() -> StringName:
+	return sprite.direction_name()
+
+func current_aim_dir() -> Vector2:
+	return get_global_mouse_position() - global_position
+
+func current_state_name() -> StringName:
+	return State.keys()[state].to_lower()

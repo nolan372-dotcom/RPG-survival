@@ -4,8 +4,9 @@ extends Resource
 ## Describes a top-down 8-direction sprite pack laid out as one PNG per animation,
 ## with directions on the Y axis and frames on the X axis.
 ##
-## Row order (top to bottom): N, NE, E, SE, S, SW, W, NW.
-## All animation sheets in a set must share the same frame size and direction count.
+## The `direction_row_order` array tells the controller which row of the sheet
+## corresponds to each compass direction. Different asset packs use different
+## orderings (CW from N, CCW from N, CW from S, etc.), so this is configurable.
 ##
 
 @export var frame_size: Vector2i = Vector2i(64, 64)
@@ -19,6 +20,13 @@ extends Resource
 ##   fps: float        (playback speed)
 ##   loop: bool
 @export var metadata: Dictionary = {}
+
+## Maps row index (0..direction_count-1, top to bottom) to compass direction.
+## Default assumes CW from N: row 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SW, 6=W, 7=NW.
+## Override per-asset if the pack uses a different convention.
+@export var direction_row_order: Array[StringName] = [
+	&"n", &"ne", &"e", &"se", &"s", &"sw", &"w", &"nw"
+]
 
 func get_sheet(anim_name: StringName) -> Texture2D:
 	return sheets.get(anim_name, null)
