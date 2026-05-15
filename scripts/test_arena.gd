@@ -51,8 +51,11 @@ func _process(_delta: float) -> void:
 	if debug_label == null or hero == null or not is_instance_valid(hero):
 		return
 	var aim: Vector2 = hero.current_aim_dir()
-	debug_label.text = "facing: %s    state: %s    aim: (%.0f, %.0f)" % [
+	var block_cd: float = hero.block_cooldown_remaining()
+	var block_status: String = "ready" if block_cd <= 0.0 else "cd %.2fs" % block_cd
+	debug_label.text = "facing: %s    state: %s    aim: (%.0f, %.0f)    block: %s" % [
 		String(hero.current_facing_name()),
 		String(hero.current_state_name()),
-		aim.x, aim.y
+		aim.x, aim.y,
+		block_status,
 	]

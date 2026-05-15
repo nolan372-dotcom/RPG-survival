@@ -22,8 +22,9 @@ signal died
 const ATTACK_HITBOX_DURATION: float = 0.18  # how long the hitbox is live during an attack
 const ATTACK_HITBOX_DELAY: float = 0.10     # delay before the hitbox activates (windup)
 const ATTACK_TOTAL_DURATION: float = 0.45   # total attack lockout duration
-const BLOCK_START_DURATION: float = 0.20    # the "windup" portion of block (includes parry window)
-const PARRY_WINDOW: float = 0.13            # 8 frames at 60fps
+const PARRY_WINDOW: float = 0.13            # 8 frames at 60fps — also the BLOCK_START duration
+const BLOCK_START_DURATION: float = PARRY_WINDOW
+const BLOCK_COOLDOWN: float = 0.35          # after exiting block, can't block again for this long
 const HURT_LOCKOUT: float = 0.20
 const HIT_STOP_DURATION: float = 0.05
 const STALWART_HP_THRESHOLD: float = 0.5
@@ -37,8 +38,8 @@ var move_speed: float = 110.0
 var state: State = State.IDLE
 var _state_timer: float = 0.0
 var _attack_hitbox_armed: bool = false
-var _block_held: bool = false
 var _parry_window_remaining: float = 0.0
+var _block_cooldown_remaining: float = 0.0
 var _hit_targets_this_swing: Array[Node] = []
 
 # --- Node refs ----------------------------------------------------------------
@@ -74,6 +75,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_state_timer += delta
 	_parry_window_remaining = max(0.0, _parry_window_remaining - delta)
+	_block_cooldown_remaining = max(0.0, _block_cooldown_remaining - delta)
 	_update_facing()
 
 	match state:
@@ -93,15 +95,16 @@ func _physics_process(delta: float) -> void:
 			velocity = velocity.lerp(Vector2.ZERO, 12.0 * delta)
 			move_and_slide()
 			if not Input.is_action_pressed("ability"):
-				_enter_idle_or_walk()
+				_exit_block_to_idle()
 			elif _state_timer >= BLOCK_START_DURATION:
 				_enter_block_hold()
 		State.BLOCK_HOLD:
 			velocity = velocity.lerp(Vector2.ZERO, 18.0 * delta)
 			move_and_slide()
 			if not Input.is_action_pressed("ability"):
-				_enter_idle_or_walk()
+				_exit_block_to_idle()
 			elif Input.is_action_just_pressed("attack"):
+				_exit_block_to_idle(false)  # release block on the way to swing
 				_enter_attack()  # break out of block to attack
 		State.HURT:
 			velocity = velocity.lerp(Vector2.ZERO, 8.0 * delta)
@@ -133,7 +136,7 @@ func _handle_free_movement(delta: float) -> void:
 func _check_action_inputs() -> void:
 	if Input.is_action_just_pressed("attack"):
 		_enter_attack()
-	elif Input.is_action_just_pressed("ability"):
+	elif Input.is_action_just_pressed("ability") and _block_cooldown_remaining <= 0.0:
 		_enter_block_start()
 
 func _update_facing() -> void:
@@ -169,6 +172,11 @@ func _enter_block_start() -> void:
 
 func _enter_block_hold() -> void:
 	_set_state(State.BLOCK_HOLD)
+
+func _exit_block_to_idle(transition_state: bool = true) -> void:
+	_block_cooldown_remaining = BLOCK_COOLDOWN
+	if transition_state:
+		_enter_idle_or_walk()
 
 func _enter_hurt() -> void:
 	_set_state(State.HURT)
@@ -299,3 +307,9 @@ func current_aim_dir() -> Vector2:
 
 func current_state_name() -> StringName:
 	return State.keys()[state].to_lower()
+
+func block_cooldown_remaining() -> float:
+	return _block_cooldown_remaining
+
+func block_cooldown_fraction() -> float:
+	return clamp(_block_cooldown_remaining / BLOCK_COOLDOWN, 0.0, 1.0)
