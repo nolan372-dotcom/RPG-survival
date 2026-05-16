@@ -10,12 +10,14 @@ anchor_bottom = 1.0
 offset_top = -88.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 script = ExtResource("1_menu")
 
 [node name="Background" type="ColorRect" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 color = Color(0.08, 0.08, 0.12, 0.85)
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
@@ -26,6 +28,7 @@ offset_left = 12.0
 offset_top = 8.0
 offset_right = -12.0
 offset_bottom = -8.0
+mouse_filter = 2
 theme_override_constants/separation = 12
 alignment = 1
 

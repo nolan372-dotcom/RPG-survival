@@ -116,6 +116,7 @@ position = Vector2(0, 220)
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="ResourceLabel" type="Label" parent="UI"]
+mouse_filter = 2
 offset_left = 12.0
 offset_top = 12.0
 offset_right = 600.0
@@ -126,6 +127,7 @@ theme_override_constants/outline_size = 4
 text = "Wood: 200    Food: 100    Gold: 100"
 
 [node name="Instructions" type="Label" parent="UI"]
+mouse_filter = 2
 offset_left = 12.0
 offset_top = 44.0
 offset_right = 900.0
