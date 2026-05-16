@@ -105,7 +105,7 @@ func _lookup(category_key: String, id: StringName) -> Resource:
 	push_warning("ContentRegistry: unknown %s id '%s'" % [category_key, String(id)])
 	return null
 
-func _scan_dir(path: String, category_key: String, expected_type_name: String, is_mod: bool) -> int:
+func _scan_dir(path: String, category_key: String, _expected_type_name: String, is_mod: bool) -> int:
 	if not DirAccess.dir_exists_absolute(path):
 		return 0
 	var loaded: int = 0

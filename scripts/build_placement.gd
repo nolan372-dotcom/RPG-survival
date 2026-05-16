@@ -68,8 +68,10 @@ func _update_ghost() -> void:
 		return
 	var mouse_world: Vector2 = get_global_mouse_position()
 	_origin_cell = grid.world_to_cell(mouse_world)
-	# Roughly center the footprint under the cursor.
+	# Roughly center the footprint under the cursor (intentional integer division).
+	@warning_ignore("integer_division")
 	_origin_cell.x -= _footprint.x / 2
+	@warning_ignore("integer_division")
 	_origin_cell.y -= _footprint.y / 2
 	var valid: bool = grid.can_place(_origin_cell, _footprint)
 	var affordable: bool = _affordable()

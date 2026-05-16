@@ -61,14 +61,14 @@ static func _segment_intersects_rect(a: Vector2, b: Vector2, r: Rect2) -> bool:
 	if r.has_point(a) or r.has_point(b):
 		return true
 	# Test each of the 4 rect edges as segments.
-	var tl := r.position
-	var tr := r.position + Vector2(r.size.x, 0)
-	var br := r.position + r.size
-	var bl := r.position + Vector2(0, r.size.y)
-	return _segments_intersect(a, b, tl, tr) \
-		or _segments_intersect(a, b, tr, br) \
-		or _segments_intersect(a, b, br, bl) \
-		or _segments_intersect(a, b, bl, tl)
+	var top_left := r.position
+	var top_right := r.position + Vector2(r.size.x, 0)
+	var bot_right := r.position + r.size
+	var bot_left := r.position + Vector2(0, r.size.y)
+	return _segments_intersect(a, b, top_left, top_right) \
+		or _segments_intersect(a, b, top_right, bot_right) \
+		or _segments_intersect(a, b, bot_right, bot_left) \
+		or _segments_intersect(a, b, bot_left, top_left)
 
 static func _segments_intersect(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2) -> bool:
 	var r: Vector2 = p2 - p1
