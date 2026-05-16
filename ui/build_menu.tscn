@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1crownwall7001"]
+[gd_scene format=3 uid="uid://b3be63xlfgvwa"]
 
 [ext_resource type="Script" path="res://scripts/build_menu.gd" id="1_menu"]
 
@@ -40,3 +40,7 @@ text = "Wall"
 [node name="TowerButton" type="Button" parent="HBoxContainer"]
 custom_minimum_size = Vector2(140, 64)
 text = "Archer Tower"
+
+[node name="StorehouseButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(140, 64)
+text = "Storehouse"

@@ -31,6 +31,7 @@ var _ghost_valid: bool = false
 
 func begin(data: BuildingData) -> void:
 	if data == null or grid == null:
+		print("[BuildPlacement] begin() bailed — data=", data, " grid=", grid)
 		return
 	_active = true
 	_data = data
@@ -39,6 +40,7 @@ func begin(data: BuildingData) -> void:
 		_hero.input_locked = true
 	_update_ghost()
 	queue_redraw()
+	print("[BuildPlacement] begin(", data.display_name, ") footprint=", _footprint, " hero_locked=", _hero != null)
 
 func cancel() -> void:
 	if not _active:
@@ -94,13 +96,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not _active:
 		return
 	if event.is_action_pressed("attack"):
+		print("[BuildPlacement] LMB received during placement at origin=", _origin_cell)
 		_try_confirm()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("cancel"):
+		print("[BuildPlacement] ESC — cancel")
 		cancel()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("rotate_placement"):
 		_footprint = Vector2i(_footprint.y, _footprint.x)
+		print("[BuildPlacement] R — rotated to footprint=", _footprint)
 		_update_ghost()
 		queue_redraw()
 		get_viewport().set_input_as_handled()
@@ -110,14 +115,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _try_confirm() -> void:
 	if not grid.can_place(_origin_cell, _footprint):
+		print("[BuildPlacement] confirm REJECTED — can_place=false at ", _origin_cell, " footprint=", _footprint, " (bounds=", grid.is_in_bounds(_origin_cell), ", occupied=", grid.is_cell_occupied(_origin_cell), ")")
 		return
 	if not _affordable():
+		print("[BuildPlacement] confirm REJECTED — not affordable. cost wood=", _data.cost_wood, " food=", _data.cost_food, " gold=", _data.cost_gold, "  have ", ResourceState.wood, "/", ResourceState.food, "/", ResourceState.gold)
 		return
 	if not ResourceState.try_spend(_data.cost_wood, _data.cost_food, _data.cost_gold):
+		print("[BuildPlacement] confirm REJECTED — try_spend returned false")
 		return
 	var origin: Vector2i = _origin_cell
 	var footprint: Vector2i = _footprint
 	var data: BuildingData = _data
+	print("[BuildPlacement] confirm ACCEPTED — placing ", data.display_name, " at ", origin)
 	_finish()
 	placement_confirmed.emit(data, origin, footprint)
 

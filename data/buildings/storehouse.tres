@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BuildingData" format=3 uid="uid://b3be63xlfavw8"]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_building"]
+
+[resource]
+script = ExtResource("1_building")
+id = &"storehouse"
+display_name = "Storehouse"
+footprint_x = 2
+footprint_y = 1
+cost_wood = 20
+cost_food = 0
+cost_gold = 0
+hp = 90
+function_type = 0
+parameters = {
+"resource_cap_bonus": 100
+}
+description = "Increases resource caps. Press R to rotate during placement."

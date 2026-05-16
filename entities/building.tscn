@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://b1crownwall6001"]
+[gd_scene format=3 uid="uid://b3be63xlffvwa"]
 
 [ext_resource type="Script" path="res://scripts/building.gd" id="1_building"]
 

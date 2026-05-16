@@ -24,6 +24,12 @@ func _ready() -> void:
 	add_to_group("castle_plot")
 	hero.add_to_group("hero")
 
+	# Castle-plot uses a wider view than combat — drop the hero's camera zoom
+	# from 2× so you can see more of the 30×30 grid at once.
+	if hero.has_node("Camera2D"):
+		var cam: Camera2D = hero.get_node("Camera2D")
+		cam.zoom = Vector2(1, 1)
+
 	# Wire cross-references that .tscn can't easily express.
 	build_placement.grid = grid
 	build_placement.threat_line = threat_line
@@ -61,11 +67,13 @@ func _on_build_button_pressed(data: BuildingData) -> void:
 
 
 func _on_placement_confirmed(data: BuildingData, origin_cell: Vector2i, footprint: Vector2i) -> void:
+	print("[CastlePlot] spawning ", data.display_name, " at cell ", origin_cell, " footprint ", footprint)
 	var b: Building = BUILDING_SCENE.instantiate()
 	buildings_root.add_child(b)
 	b.global_position = grid.cell_to_world(origin_cell)
 	b.setup(data, origin_cell, footprint)
 	grid.reserve_forced(b, origin_cell, footprint)
+	print("[CastlePlot] spawned at global_position=", b.global_position, " visual_size=(", footprint.x * GridManager.CELL_SIZE, ",", footprint.y * GridManager.CELL_SIZE, ")")
 
 
 func _on_resources_changed(wood: int, food: int, gold: int) -> void:
