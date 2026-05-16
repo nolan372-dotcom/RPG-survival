@@ -23,9 +23,6 @@ var _data: BuildingData
 var _footprint: Vector2i = Vector2i(1, 1)
 var _origin_cell: Vector2i = Vector2i.ZERO
 var _ghost_valid: bool = false
-# Suppresses the very next polled "attack" press so the click that opened the
-# build menu doesn't also fire a confirm on the same frame.
-var _suppress_next_attack: bool = true
 
 @onready var _hero: Hero = get_node_or_null(hero_path) as Hero
 
@@ -39,7 +36,6 @@ func begin(data: BuildingData) -> void:
 	_active = true
 	_data = data
 	_footprint = Vector2i(max(1, data.footprint_x), max(1, data.footprint_y))
-	_suppress_next_attack = true  # swallow the click that opened the menu
 	if _hero != null:
 		_hero.input_locked = true
 	_update_ghost()
@@ -65,20 +61,29 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 	if threat_line != null and threat_line.has_method("update_for_ghost"):
 		threat_line.update_for_ghost(_origin_cell, _footprint, _data != null)
-	# Polling-based confirm — robust to UI Controls consuming the InputEvent
-	# (which is what bit us when Labels with default mouse_filter=STOP ate the
-	# click). Skip if the cursor is over a "hoverable" Control (e.g. a button).
-	if Input.is_action_just_pressed("attack"):
-		if _suppress_next_attack:
-			_suppress_next_attack = false
-			print("[BuildPlacement] (polling) attack suppressed for opening-click")
-			return
-		var hovered: Control = get_viewport().gui_get_hovered_control()
-		if hovered != null:
-			print("[BuildPlacement] (polling) attack ignored — cursor over Control: ", hovered.name)
-			return
-		print("[BuildPlacement] (polling) attack received at origin=", _origin_cell)
-		_try_confirm()
+
+
+# _input fires BEFORE GUI processing, so on the frame the user clicks a menu
+# button this method runs while _active is still false (placement hasn't started
+# yet) and harmlessly returns. The button's pressed signal then triggers begin().
+# Subsequent grass clicks fire _input while _active is true and route through
+# _try_confirm. No suppression hacks needed.
+func _input(event: InputEvent) -> void:
+	if not _active:
+		return
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
+		return
+	# Don't confirm if the cursor is over a UI button.
+	var hovered: Control = get_viewport().gui_get_hovered_control()
+	if hovered != null:
+		print("[BuildPlacement] (_input) LMB ignored — cursor over Control: ", hovered.name)
+		return
+	print("[BuildPlacement] (_input) LMB received at origin=", _origin_cell)
+	_try_confirm()
+	get_viewport().set_input_as_handled()
 
 
 func _update_ghost() -> void:
