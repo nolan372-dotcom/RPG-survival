@@ -144,6 +144,6 @@ text = "Castle Plot — C8 prototype
 Explore: WASD walk, LMB attack, RMB block.
 B: toggle BUILD MODE (knight freezes, camera zooms out, grid + buttons appear).
 In build mode: click button, then LMB on grid to place, R to rotate, ESC to cancel placement.
-F8: switch to combat test arena."
+F9: switch to combat test arena.  (Don't use F8 — that's Godot's Stop shortcut.)"
 
 [node name="BuildMenu" parent="UI" instance=ExtResource("6_menu")]

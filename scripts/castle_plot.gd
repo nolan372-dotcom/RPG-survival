@@ -74,19 +74,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_build_mode()
 		get_viewport().set_input_as_handled()
 		return
-	# F8 — quick scene swap to combat test arena.
-	if event is InputEventKey and event.pressed and event.keycode == KEY_F8:
-		print("[CastlePlot] F8 → switching to test_arena.tscn")
-		# Always exit build mode first so we don't carry a greyed hero / build
-		# camera into the new scene.
+	# F9 — quick scene swap to combat test arena. (F8 is Godot's "Stop" shortcut,
+	# don't use it.)
+	if event is InputEventKey and event.pressed and event.keycode == KEY_F9:
 		if _build_mode:
 			_exit_build_mode()
 		var err: int = get_tree().change_scene_to_file("res://scenes/test_arena.tscn")
 		if err != OK:
 			push_error("change_scene_to_file failed with error code %d" % err)
-			print("[CastlePlot] scene change FAILED with err=%d" % err)
-		else:
-			print("[CastlePlot] scene change queued OK")
 
 
 # --- Build mode toggle -------------------------------------------------------
