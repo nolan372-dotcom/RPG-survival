@@ -37,8 +37,11 @@ const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
 # Where the stump renders relative to the StaticBody origin. The stump
 # collision shape (set in complete_harvest) is co-located with this so
 # they read as the same physical object.
-const STUMP_OFFSET: Vector2 = Vector2(0, 15)
-const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 15)
+# TEST VALUE (was 15): pushed to 80 to verify visually that the offset is
+# the right knob. If stump now visibly lands ON the hero this confirms the
+# math-vs-visual mismatch is offset-driven and we just need the right value.
+const STUMP_OFFSET: Vector2 = Vector2(0, 80)
+const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 80)
 const STUMP_COLLISION_RADIUS: float = 8.0
 
 # Harvest tuning.
