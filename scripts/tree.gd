@@ -113,6 +113,10 @@ func _swap_to_stump() -> void:
 		return
 	sprite.offset = STUMP_OFFSET
 	sprite.region_rect = STUMP_REGION
+	print("[Swap] tree.gp=", global_position,
+		"  sprite.offset (after set)=", sprite.offset,
+		"  sprite.global_position=", sprite.global_position,
+		"  expected stump visual center at world y=", global_position.y + STUMP_OFFSET.y)
 
 func _spawn_falling_log() -> void:
 	# Snapshot the original tree visual into a free-standing pivot Node2D
