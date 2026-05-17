@@ -8,15 +8,19 @@ extends StaticBody2D
 ## Harvest interaction is wired up in C6 Chunk 3 (E to chop, time, drop wood).
 ##
 
-const TREE_CELL_SIZE: Vector2i = Vector2i(128, 160)
-# Only row 0 is used. The row 0 trees are taller than 160px, so their
-# shadow + base overflow into row 1's cell area. Cropping row 1 produces
-# a "ghost stump" at the top of the sprite — visible as floating
-# stump-like artifacts at playtest. Rows 2-3 have similar overflow plus
-# their own variant inconsistencies. Col 3 contains the standalone stump
-# and shadow ovals.
-# Net: 3 clean variants from row 0 cols 0-2. Plenty of variety; all
-# render as full upright pines.
+# Atlas geometry:
+#   Cells are packed every 128 px in x and 160 px in y, but the actual
+#   row 0 trees are TALLER than 160 — their shadow ellipse + trunk base
+#   spills 40 px into row 1's cell space. So we use 160 as the inter-row
+#   STRIDE (where each variant starts) but 200 as the crop HEIGHT (so
+#   the shadow is included rather than cut off at y=160).
+const TREE_CELL_X: int = 128
+const TREE_CELL_Y_STRIDE: int = 160
+const TREE_CROP_W: int = 128
+const TREE_CROP_H: int = 200
+
+# Only row 0 variants (cols 0-2). Other rows would need per-variant offsets
+# because their trees occupy different parts of their nominal cell area.
 const VARIANTS: Array[Vector2i] = [
 	Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0),
 ]
@@ -36,4 +40,4 @@ func _apply_variant() -> void:
 		return
 	var v: Vector2i = VARIANTS[variant % VARIANTS.size()]
 	sprite.region_enabled = true
-	sprite.region_rect = Rect2(v.x * TREE_CELL_SIZE.x, v.y * TREE_CELL_SIZE.y, TREE_CELL_SIZE.x, TREE_CELL_SIZE.y)
+	sprite.region_rect = Rect2(v.x * TREE_CELL_X, v.y * TREE_CELL_Y_STRIDE, TREE_CROP_W, TREE_CROP_H)
