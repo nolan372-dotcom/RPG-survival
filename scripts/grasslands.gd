@@ -14,8 +14,10 @@ extends Node2D
 ##   V   -> toggle BiomeZone debug rectangles
 ##
 
-@onready var hero: Hero = $Hero
-@onready var trees_root: Node2D = $Trees
+## World is the y-sorted parent of both Hero and all spawned trees, so they
+## render in the correct z-order based on their y position.
+@onready var world: Node2D = $World
+@onready var hero: Hero = $World/Hero
 @onready var zones_root: Node2D = $BiomeZones
 @onready var generator: BiomeGenerator = $BiomeGenerator
 @onready var seed_label: Label = $UI/SeedLabel
@@ -55,11 +57,15 @@ func _pick_seed() -> int:
 
 func _regenerate(new_seed: int) -> void:
 	current_seed = new_seed
-	for child in trees_root.get_children():
+	# Clear all spawned trees in World, but leave Hero (and any future
+	# persistent entities) alone.
+	for child in world.get_children():
+		if child == hero:
+			continue
 		child.queue_free()
 	var zones: Array = zones_root.get_children()
 	var clearance: Array[Vector2] = [hero.global_position]
-	var count: int = generator.populate(zones, trees_root, current_seed, clearance)
+	var count: int = generator.populate(zones, world, current_seed, clearance)
 	_update_seed_label(count)
 
 

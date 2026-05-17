@@ -58,10 +58,10 @@ min_separation = 140.0
 [node name="BiomeGenerator" type="Node" parent="."]
 script = ExtResource("5_gen")
 
-[node name="Trees" type="Node2D" parent="."]
+[node name="World" type="Node2D" parent="."]
 y_sort_enabled = true
 
-[node name="Hero" parent="." instance=ExtResource("3_hero")]
+[node name="Hero" parent="World" instance=ExtResource("3_hero")]
 position = Vector2(0, 0)
 
 [node name="UI" type="CanvasLayer" parent="."]
