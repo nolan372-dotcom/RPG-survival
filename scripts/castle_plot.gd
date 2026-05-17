@@ -76,7 +76,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	# F8 — quick scene swap to combat test arena.
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F8:
-		get_tree().change_scene_to_file("res://scenes/test_arena.tscn")
+		print("[CastlePlot] F8 → switching to test_arena.tscn")
+		# Always exit build mode first so we don't carry a greyed hero / build
+		# camera into the new scene.
+		if _build_mode:
+			_exit_build_mode()
+		var err: int = get_tree().change_scene_to_file("res://scenes/test_arena.tscn")
+		if err != OK:
+			push_error("change_scene_to_file failed with error code %d" % err)
+			print("[CastlePlot] scene change FAILED with err=%d" % err)
+		else:
+			print("[CastlePlot] scene change queued OK")
 
 
 # --- Build mode toggle -------------------------------------------------------
