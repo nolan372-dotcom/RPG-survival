@@ -112,13 +112,20 @@ func complete_harvest() -> int:
 func _swap_to_stump() -> void:
 	if sprite == null:
 		return
-	# Shift via sprite.position rather than sprite.offset — setting offset
-	# at runtime produced no visible movement during Chunk 3a playtest
-	# (likely a Godot quirk around centered sprites + offset reassignment).
-	# Moving the sprite node directly works as expected.
-	sprite.offset = Vector2.ZERO
-	sprite.position = STUMP_OFFSET
-	sprite.region_rect = STUMP_REGION
+	# Modifying the existing tree sprite's offset / position at runtime didn't
+	# move the visual during playtest (the stump kept rendering where the tree
+	# was, regardless of new values — some Godot rendering quirk we couldn't
+	# pin down). Workaround: hide the tree sprite entirely and spawn a fresh
+	# Sprite2D for the stump at the desired position.
+	sprite.visible = false
+	var stump_sprite := Sprite2D.new()
+	stump_sprite.name = "StumpSprite"
+	stump_sprite.texture = sprite.texture
+	stump_sprite.region_enabled = true
+	stump_sprite.region_rect = STUMP_REGION
+	stump_sprite.position = STUMP_OFFSET
+	stump_sprite.z_index = 0
+	add_child(stump_sprite)
 
 func _spawn_falling_log() -> void:
 	# Snapshot the original tree visual into a free-standing pivot Node2D
