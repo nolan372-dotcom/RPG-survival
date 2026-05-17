@@ -7,6 +7,7 @@ extends Node2D
 ##
 
 const BUILDING_SCENE: PackedScene = preload("res://entities/building.tscn")
+const HERO_GREYED_MODULATE: Color = Color(0.55, 0.55, 0.6, 0.55)
 
 @onready var grid: GridManager = $Grid
 @onready var build_placement: BuildPlacement = $Grid/BuildPlacement
@@ -14,10 +15,14 @@ const BUILDING_SCENE: PackedScene = preload("res://entities/building.tscn")
 @onready var build_menu: BuildMenu = $UI/BuildMenu
 @onready var resource_label: Label = $UI/ResourceLabel
 @onready var hero: Hero = $Hero
+@onready var hero_camera: Camera2D = $Hero/Camera2D
+@onready var build_camera: Camera2D = $BuildCamera
 @onready var castle_pre: StaticBody2D = $Grid/PrePlaced/Castle
 @onready var shrine_pre: Node2D = $Grid/PrePlaced/Shrine
 @onready var spawn_markers: Node2D = $Grid/SpawnMarkers
 @onready var buildings_root: Node2D = $Grid/Buildings
+
+var _build_mode: bool = false
 
 
 func _ready() -> void:
@@ -55,11 +60,53 @@ func _ready() -> void:
 	ResourceState.resources_changed.connect(_on_resources_changed)
 	_on_resources_changed(ResourceState.wood, ResourceState.food, ResourceState.gold)
 
+	# Start in explore mode: hero camera live, build UI hidden, grid lines off.
+	hero_camera.make_current()
+	build_menu.visible = false
+	grid.set_lines_visible(false)
+	# Park the build camera over the castle's center so it doesn't drift.
+	build_camera.global_position = grid.footprint_center_world(Vector2i(13, 13), Vector2i(4, 4))
+
 
 func _unhandled_input(event: InputEvent) -> void:
+	# B — toggle build mode (action is bound in project.godot as open_build_menu).
+	if event.is_action_pressed("open_build_menu"):
+		_toggle_build_mode()
+		get_viewport().set_input_as_handled()
+		return
 	# F8 — quick scene swap to combat test arena.
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F8:
 		get_tree().change_scene_to_file("res://scenes/test_arena.tscn")
+
+
+# --- Build mode toggle -------------------------------------------------------
+
+func _toggle_build_mode() -> void:
+	if _build_mode:
+		_exit_build_mode()
+	else:
+		_enter_build_mode()
+
+func _enter_build_mode() -> void:
+	_build_mode = true
+	hero.input_locked = true
+	hero.modulate = HERO_GREYED_MODULATE
+	hero.velocity = Vector2.ZERO
+	build_camera.make_current()
+	grid.set_lines_visible(true)
+	build_menu.visible = true
+	print("[CastlePlot] BUILD mode")
+
+func _exit_build_mode() -> void:
+	_build_mode = false
+	if build_placement.is_active():
+		build_placement.cancel()
+	hero.input_locked = false
+	hero.modulate = Color.WHITE
+	hero_camera.make_current()
+	grid.set_lines_visible(false)
+	build_menu.visible = false
+	print("[CastlePlot] EXPLORE mode")
 
 
 func _on_build_button_pressed(data: BuildingData) -> void:

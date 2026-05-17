@@ -16,8 +16,33 @@ const CELL_SIZE: int = 32
 # footprint maps back to the same node, for collision checks.
 var _occupancy: Dictionary = {}
 
+var _show_lines: bool = false
+
 signal building_placed(building: Node, origin: Vector2i, footprint: Vector2i)
 signal building_removed(building: Node)
+
+
+# --- Grid line overlay (toggled on in build mode) ----------------------------
+
+func set_lines_visible(yes: bool) -> void:
+	_show_lines = yes
+	queue_redraw()
+
+func _draw() -> void:
+	if not _show_lines:
+		return
+	var minor: Color = Color(0, 0, 0, 0.18)
+	var major: Color = Color(0, 0, 0, 0.35)
+	var w: float = grid_cols * CELL_SIZE
+	var h: float = grid_rows * CELL_SIZE
+	for col in grid_cols + 1:
+		var x: float = col * CELL_SIZE
+		var col_color: Color = major if (col % 5 == 0) else minor
+		draw_line(Vector2(x, 0), Vector2(x, h), col_color, 1.0)
+	for row in grid_rows + 1:
+		var y: float = row * CELL_SIZE
+		var row_color: Color = major if (row % 5 == 0) else minor
+		draw_line(Vector2(0, y), Vector2(w, y), row_color, 1.0)
 
 
 # --- Coordinate conversion ----------------------------------------------------
