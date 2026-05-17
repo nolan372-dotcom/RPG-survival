@@ -55,6 +55,42 @@ min_count = 10
 max_count = 16
 min_separation = 140.0
 
+[node name="BerryZoneEastMid" type="Node2D" parent="BiomeZones"]
+position = Vector2(400, -150)
+script = ExtResource("4_zone")
+size = Vector2(500, 400)
+content_kind = 1
+min_count = 5
+max_count = 9
+min_separation = 60.0
+
+[node name="BerryZoneSouthWest" type="Node2D" parent="BiomeZones"]
+position = Vector2(-400, 250)
+script = ExtResource("4_zone")
+size = Vector2(500, 400)
+content_kind = 1
+min_count = 4
+max_count = 8
+min_separation = 60.0
+
+[node name="GoldZoneFarWest" type="Node2D" parent="BiomeZones"]
+position = Vector2(-850, -200)
+script = ExtResource("4_zone")
+size = Vector2(400, 500)
+content_kind = 2
+min_count = 2
+max_count = 4
+min_separation = 100.0
+
+[node name="GoldZoneFarEast" type="Node2D" parent="BiomeZones"]
+position = Vector2(850, 250)
+script = ExtResource("4_zone")
+size = Vector2(400, 500)
+content_kind = 2
+min_count = 2
+max_count = 4
+min_separation = 100.0
+
 [node name="BiomeGenerator" type="Node" parent="."]
 script = ExtResource("5_gen")
 
@@ -75,9 +111,9 @@ offset_bottom = 80.0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-text = "Grasslands — C6 prototype (Chunk 3a: harvest)
-WASD walk.  Hold E near a tree to chop (3s).  G new seed.  V zones.
-F9 combat arena   F10 castle plot"
+text = "Grasslands — C6 prototype (Chunk 3b: berries + gold)
+WASD walk.  Hold E near a tree (chop, 3s) / bush (forage, 1.5s) / rock (mine, 4s).
+G new seed.  V zones.   F9 combat arena   F10 castle plot"
 
 [node name="SeedLabel" type="Label" parent="UI"]
 mouse_filter = 2

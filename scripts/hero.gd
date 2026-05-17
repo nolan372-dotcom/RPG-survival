@@ -50,6 +50,7 @@ var input_locked: bool = false
 var _harvest_target: Node = null
 var _harvest_total_time: float = 0.0
 var _next_harvest_tick_at: float = 0.0
+var _harvest_target_duration: float = 3.0
 
 # --- Node refs ----------------------------------------------------------------
 @onready var sprite: HeroSpriteController = $Sprite
@@ -208,6 +209,10 @@ func _try_start_harvest() -> void:
 	_harvest_target = target
 	_harvest_total_time = 0.0
 	_next_harvest_tick_at = 0.5
+	# Harvest duration is per-target (a berry forage is quicker than a tree chop).
+	_harvest_target_duration = TreeNode.HARVEST_TIME
+	if "HARVEST_TIME" in target:
+		_harvest_target_duration = target.HARVEST_TIME
 	_set_state(State.HARVEST)
 	# Face the target while harvesting so the swing animation aims at it.
 	var dir: Vector2 = target.global_position - global_position
@@ -254,18 +259,21 @@ func _update_harvest(delta: float) -> void:
 		if _harvest_target.has_method("tree_shake"):
 			_harvest_target.tree_shake()
 	# Done?
-	if _harvest_total_time >= TreeNode.HARVEST_TIME:
+	if _harvest_total_time >= _harvest_target_duration:
 		_complete_harvest()
 
 func _complete_harvest() -> void:
 	var target: Node = _harvest_target
 	_harvest_target = null
-	var wood: int = 0
+	var amount: int = 0
+	var kind: StringName = &"wood"
 	if target != null and target.has_method("complete_harvest"):
-		wood = target.complete_harvest()
-	if wood > 0:
-		ResourceState.add(ResourceState.WOOD, wood)
-		_spawn_resource_popup(target as Node2D, wood, &"wood")
+		amount = target.complete_harvest()
+		if "resource_kind" in target:
+			kind = target.resource_kind
+	if amount > 0:
+		ResourceState.add(kind, amount)
+		_spawn_resource_popup(target as Node2D, amount, kind)
 	_enter_idle_or_walk()
 
 func _cancel_harvest() -> void:

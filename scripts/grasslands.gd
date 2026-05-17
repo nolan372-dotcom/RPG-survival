@@ -72,9 +72,9 @@ func _regenerate(new_seed: int) -> void:
 	_update_seed_label(count)
 
 
-func _update_seed_label(tree_count: int) -> void:
+func _update_seed_label(entity_count: int) -> void:
 	if seed_label != null:
-		seed_label.text = "seed: %d    trees: %d    (G: regenerate, V: zones)" % [current_seed, tree_count]
+		seed_label.text = "seed: %d    entities: %d    (G: regenerate, V: zones)" % [current_seed, entity_count]
 
 
 func _toggle_zone_debug() -> void:

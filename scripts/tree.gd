@@ -51,17 +51,23 @@ const FALL_CROP_HEIGHT: int = 160
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
-const WOOD_PER_HARVEST: int = 5
 const INTERACTION_RADIUS: float = 56.0  # hero must be this close to start harvest
 const SHAKE_AMPLITUDE: float = 3.0
 
-signal harvested(wood_amount: int)
+# Resource yield — read by Hero._complete_harvest. Both fields are exported
+# so the BiomeGenerator (or designer in inspector) could tune individual trees
+# later, but defaults match the GDD: chop a tree, get 5 wood.
+@export var resource_kind: StringName = &"wood"
+@export var resource_amount: int = 5
+
+signal harvested(amount: int)
 
 @export var variant: int = 0
 @export var randomize_variant_on_ready: bool = true
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var collision: CollisionShape2D = $CollisionShape2D
+@onready var splinters: CPUParticles2D = $Splinters
 
 var is_chopped: bool = false
 var _original_sprite_offset: Vector2
@@ -98,6 +104,10 @@ func tree_shake() -> void:
 	t.tween_property(sprite, "offset", origin + Vector2(SHAKE_AMPLITUDE, 0), 0.04)
 	t.tween_property(sprite, "offset", origin - Vector2(SHAKE_AMPLITUDE, 0), 0.04)
 	t.tween_property(sprite, "offset", origin, 0.06)
+	# Burst of wood splinters from the trunk on each chop hit.
+	if splinters != null:
+		splinters.restart()
+		splinters.emitting = true
 
 func complete_harvest() -> int:
 	if is_chopped:
@@ -113,8 +123,8 @@ func complete_harvest() -> int:
 		collision.position = STUMP_COLLISION_POSITION
 	_spawn_falling_log()
 	_swap_to_stump()
-	harvested.emit(WOOD_PER_HARVEST)
-	return WOOD_PER_HARVEST
+	harvested.emit(resource_amount)
+	return resource_amount
 
 func _swap_to_stump() -> void:
 	if sprite == null:
