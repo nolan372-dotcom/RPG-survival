@@ -31,7 +31,7 @@ var _ghost_valid: bool = false
 
 func begin(data: BuildingData) -> void:
 	if data == null or grid == null:
-		print("[BuildPlacement] begin() bailed — data=", data, " grid=", grid)
+		push_warning("BuildPlacement.begin() bailed — data or grid not set")
 		return
 	_active = true
 	_data = data
@@ -40,7 +40,6 @@ func begin(data: BuildingData) -> void:
 		_hero.input_locked = true
 	_update_ghost()
 	queue_redraw()
-	print("[BuildPlacement] begin(", data.display_name, ") footprint=", _footprint, " hero_locked=", _hero != null)
 
 func cancel() -> void:
 	if not _active:
@@ -69,11 +68,6 @@ func _process(_delta: float) -> void:
 # Subsequent grass clicks fire _input while _active is true and route through
 # _try_confirm. No suppression hacks needed.
 func _input(event: InputEvent) -> void:
-	# DIAGNOSTIC: log all mouse button events regardless of active state, so we
-	# can see whether the click is even reaching us. Remove after debugging.
-	if event is InputEventMouseButton:
-		var diag := event as InputEventMouseButton
-		print("[BuildPlacement] _input mouse button=", diag.button_index, " pressed=", diag.pressed, " active=", _active)
 	if not _active:
 		return
 	if not (event is InputEventMouseButton):
@@ -81,12 +75,10 @@ func _input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
 		return
-	# Don't confirm if the cursor is over a UI button.
-	var hovered: Control = get_viewport().gui_get_hovered_control()
-	if hovered != null:
-		print("[BuildPlacement] (_input) LMB ignored — cursor over Control: ", hovered.name)
+	# Don't confirm if the cursor is over a UI button. Decorative ColorRects
+	# should be set to mouse_filter=IGNORE so they aren't reported here.
+	if get_viewport().gui_get_hovered_control() != null:
 		return
-	print("[BuildPlacement] (_input) LMB received at origin=", _origin_cell)
 	_try_confirm()
 	get_viewport().set_input_as_handled()
 
@@ -123,23 +115,13 @@ func _draw() -> void:
 # --- Input -------------------------------------------------------------------
 
 func _unhandled_input(event: InputEvent) -> void:
-	# DIAGNOSTIC: log mouse button events at this stage too. Remove after debugging.
-	if event is InputEventMouseButton:
-		var diag := event as InputEventMouseButton
-		print("[BuildPlacement] _unhandled_input mouse button=", diag.button_index, " pressed=", diag.pressed, " active=", _active)
 	if not _active:
 		return
-	if event.is_action_pressed("attack"):
-		print("[BuildPlacement] (_unhandled_input) attack action received at origin=", _origin_cell)
-		_try_confirm()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("cancel"):
-		print("[BuildPlacement] ESC — cancel")
+	if event.is_action_pressed("cancel"):
 		cancel()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("rotate_placement"):
 		_footprint = Vector2i(_footprint.y, _footprint.x)
-		print("[BuildPlacement] R — rotated to footprint=", _footprint)
 		_update_ghost()
 		queue_redraw()
 		get_viewport().set_input_as_handled()
@@ -149,18 +131,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _try_confirm() -> void:
 	if not grid.can_place(_origin_cell, _footprint):
-		print("[BuildPlacement] confirm REJECTED — can_place=false at ", _origin_cell, " footprint=", _footprint, " (bounds=", grid.is_in_bounds(_origin_cell), ", occupied=", grid.is_cell_occupied(_origin_cell), ")")
 		return
 	if not _affordable():
-		print("[BuildPlacement] confirm REJECTED — not affordable. cost wood=", _data.cost_wood, " food=", _data.cost_food, " gold=", _data.cost_gold, "  have ", ResourceState.wood, "/", ResourceState.food, "/", ResourceState.gold)
 		return
 	if not ResourceState.try_spend(_data.cost_wood, _data.cost_food, _data.cost_gold):
-		print("[BuildPlacement] confirm REJECTED — try_spend returned false")
 		return
 	var origin: Vector2i = _origin_cell
 	var footprint: Vector2i = _footprint
 	var data: BuildingData = _data
-	print("[BuildPlacement] confirm ACCEPTED — placing ", data.display_name, " at ", origin)
 	_finish()
 	placement_confirmed.emit(data, origin, footprint)
 

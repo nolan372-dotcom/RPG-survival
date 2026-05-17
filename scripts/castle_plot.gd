@@ -95,7 +95,6 @@ func _enter_build_mode() -> void:
 	build_camera.make_current()
 	grid.set_lines_visible(true)
 	build_menu.visible = true
-	print("[CastlePlot] BUILD mode")
 
 func _exit_build_mode() -> void:
 	_build_mode = false
@@ -106,7 +105,6 @@ func _exit_build_mode() -> void:
 	hero_camera.make_current()
 	grid.set_lines_visible(false)
 	build_menu.visible = false
-	print("[CastlePlot] EXPLORE mode")
 
 
 func _on_build_button_pressed(data: BuildingData) -> void:
@@ -114,13 +112,11 @@ func _on_build_button_pressed(data: BuildingData) -> void:
 
 
 func _on_placement_confirmed(data: BuildingData, origin_cell: Vector2i, footprint: Vector2i) -> void:
-	print("[CastlePlot] spawning ", data.display_name, " at cell ", origin_cell, " footprint ", footprint)
 	var b: Building = BUILDING_SCENE.instantiate()
 	buildings_root.add_child(b)
 	b.global_position = grid.cell_to_world(origin_cell)
 	b.setup(data, origin_cell, footprint)
 	grid.reserve_forced(b, origin_cell, footprint)
-	print("[CastlePlot] spawned at global_position=", b.global_position, " visual_size=(", footprint.x * GridManager.CELL_SIZE, ",", footprint.y * GridManager.CELL_SIZE, ")")
 
 
 func _on_resources_changed(wood: int, food: int, gold: int) -> void:
