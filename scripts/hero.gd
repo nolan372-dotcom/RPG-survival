@@ -262,6 +262,13 @@ func _complete_harvest() -> void:
 	_harvest_target = null
 	var wood: int = 0
 	if target != null and target.has_method("complete_harvest"):
+		# DIAGNOSTIC: log actual world coords so we can see where things really
+		# are. Remove once the stump/hero alignment is confirmed visually.
+		var t2d := target as Node2D
+		print("[Chop complete] hero.gp=", global_position,
+			"  tree.gp=", t2d.global_position,
+			"  dist=", "%.1f" % global_position.distance_to(t2d.global_position),
+			"  (stump will render at tree.gp + (0, ", TreeNode.STUMP_OFFSET.y, "))")
 		wood = target.complete_harvest()
 	if wood > 0:
 		ResourceState.add(ResourceState.WOOD, wood)
