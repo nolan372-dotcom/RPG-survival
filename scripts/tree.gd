@@ -114,12 +114,17 @@ func complete_harvest() -> int:
 func _swap_to_stump() -> void:
 	if sprite == null:
 		return
-	sprite.offset = STUMP_OFFSET
+	# Shift via sprite.position (the node) instead of sprite.offset.
+	# Setting offset showed no visible effect during playtest — possibly a
+	# rendering pipeline quirk I'm not catching. Moving the sprite node is
+	# more direct.
+	sprite.offset = Vector2.ZERO
+	sprite.position = STUMP_OFFSET
 	sprite.region_rect = STUMP_REGION
 	print("[Swap] tree.gp=", global_position,
-		"  sprite.offset (after set)=", sprite.offset,
-		"  sprite.global_position=", sprite.global_position,
-		"  expected stump visual center at world y=", global_position.y + STUMP_OFFSET.y)
+		"  sprite.position (after set)=", sprite.position,
+		"  sprite.offset=", sprite.offset,
+		"  sprite.global_position=", sprite.global_position)
 
 func _spawn_falling_log() -> void:
 	# Snapshot the original tree visual into a free-standing pivot Node2D
