@@ -38,9 +38,15 @@ const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
 # Found empirically: changing sprite.offset had no visible effect (Godot
 # rendering quirk?), but sprite.position works. Collision and visual are
 # co-located so they read as one object.
-const STUMP_OFFSET: Vector2 = Vector2(0, 25)
-const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 25)
+const STUMP_OFFSET: Vector2 = Vector2(0, 15)
+const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 15)
 const STUMP_COLLISION_RADIUS: float = 10.0
+
+# Falling log: how much of the original tree's vertical extent is animated
+# when chopped. The full tree is 200px; we crop to just the upper foliage
+# section so the trunk + shadow don't appear to "pop out of the ground" and
+# fall — they're already replaced by the stump.
+const FALL_CROP_HEIGHT: int = 130
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
@@ -128,9 +134,11 @@ func _swap_to_stump() -> void:
 	add_child(stump_sprite)
 
 func _spawn_falling_log() -> void:
-	# Snapshot the original tree visual into a free-standing pivot Node2D
-	# positioned at this tree's trunk base, then tween-rotate it 90deg around
-	# the base so it visually falls to the right, fading out at the end.
+	# Snapshot just the foliage portion (top FALL_CROP_HEIGHT pixels) into a
+	# free-standing pivot Node2D, positioned at the tree's trunk base, then
+	# tween-rotate the pivot 90deg so the foliage tips over and fades. The
+	# trunk + shadow are NOT in the falling sprite — the stump already
+	# replaced them. This avoids the "whole tree pops up and falls" look.
 	var pivot := Node2D.new()
 	pivot.global_position = global_position
 
@@ -138,8 +146,12 @@ func _spawn_falling_log() -> void:
 	log_sprite.texture = sprite.texture
 	log_sprite.region_enabled = true
 	var v: Vector2i = VARIANTS[variant % VARIANTS.size()]
-	log_sprite.region_rect = Rect2(v.x * TREE_CELL_X, v.y * TREE_CELL_Y_STRIDE, TREE_CROP_W, TREE_CROP_H)
-	log_sprite.offset = _original_sprite_offset
+	log_sprite.region_rect = Rect2(v.x * TREE_CELL_X, v.y * TREE_CELL_Y_STRIDE, TREE_CROP_W, FALL_CROP_HEIGHT)
+	# Original tree's foliage top was at world y = origin + _original_sprite_offset.y - TREE_CROP_H/2
+	# = origin + (-52) - 100 = origin - 152.
+	# For the cropped sprite (FALL_CROP_HEIGHT tall, centered) to have its top
+	# at the same world y, offset.y = -152 + FALL_CROP_HEIGHT/2 = -152 + 65 = -87.
+	log_sprite.offset = Vector2(0, -152 + FALL_CROP_HEIGHT / 2)
 	log_sprite.z_index = 1  # draw above the stump that replaces us
 
 	pivot.add_child(log_sprite)
