@@ -27,35 +27,39 @@ size_flags_vertical = 0
 position = Vector2(0, -500)
 script = ExtResource("4_zone")
 size = Vector2(1000, 500)
-min_count = 18
-max_count = 28
-min_separation = 110.0
+min_count = 14
+max_count = 22
+min_separation = 140.0
 
 [node name="ZoneEast" type="Node2D" parent="BiomeZones"]
 position = Vector2(700, 0)
 script = ExtResource("4_zone")
 size = Vector2(600, 700)
-min_count = 14
-max_count = 22
+min_count = 12
+max_count = 18
+min_separation = 140.0
 
 [node name="ZoneWest" type="Node2D" parent="BiomeZones"]
 position = Vector2(-700, 0)
 script = ExtResource("4_zone")
 size = Vector2(600, 700)
-min_count = 14
-max_count = 22
+min_count = 12
+max_count = 18
+min_separation = 140.0
 
 [node name="ZoneSouth" type="Node2D" parent="BiomeZones"]
 position = Vector2(0, 500)
 script = ExtResource("4_zone")
 size = Vector2(1000, 500)
 min_count = 10
-max_count = 18
+max_count = 16
+min_separation = 140.0
 
 [node name="BiomeGenerator" type="Node" parent="."]
 script = ExtResource("5_gen")
 
 [node name="Trees" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="Hero" parent="." instance=ExtResource("3_hero")]
 position = Vector2(0, 0)
