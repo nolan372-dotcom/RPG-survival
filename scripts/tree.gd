@@ -34,15 +34,13 @@ const VARIANTS: Array[Vector2i] = [
 # Cropped to 128x80 because the stump itself is small and the rest of that
 # cell region contains shadow ovals we don't want.
 const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
-# Where the stump renders relative to the StaticBody origin. The stump
-# collision shape (set in complete_harvest) is co-located with this so
-# they read as the same physical object.
-# TEST VALUE (was 15): pushed to 80 to verify visually that the offset is
-# the right knob. If stump now visibly lands ON the hero this confirms the
-# math-vs-visual mismatch is offset-driven and we just need the right value.
-const STUMP_OFFSET: Vector2 = Vector2(0, 80)
-const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 80)
-const STUMP_COLLISION_RADIUS: float = 8.0
+# Where the stump renders + collides relative to the StaticBody origin.
+# Found empirically: changing sprite.offset had no visible effect (Godot
+# rendering quirk?), but sprite.position works. Collision and visual are
+# co-located so they read as one object.
+const STUMP_OFFSET: Vector2 = Vector2(0, 65)
+const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 65)
+const STUMP_COLLISION_RADIUS: float = 14.0
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
@@ -114,17 +112,13 @@ func complete_harvest() -> int:
 func _swap_to_stump() -> void:
 	if sprite == null:
 		return
-	# Shift via sprite.position (the node) instead of sprite.offset.
-	# Setting offset showed no visible effect during playtest — possibly a
-	# rendering pipeline quirk I'm not catching. Moving the sprite node is
-	# more direct.
+	# Shift via sprite.position rather than sprite.offset — setting offset
+	# at runtime produced no visible movement during Chunk 3a playtest
+	# (likely a Godot quirk around centered sprites + offset reassignment).
+	# Moving the sprite node directly works as expected.
 	sprite.offset = Vector2.ZERO
 	sprite.position = STUMP_OFFSET
 	sprite.region_rect = STUMP_REGION
-	print("[Swap] tree.gp=", global_position,
-		"  sprite.position (after set)=", sprite.position,
-		"  sprite.offset=", sprite.offset,
-		"  sprite.global_position=", sprite.global_position)
 
 func _spawn_falling_log() -> void:
 	# Snapshot the original tree visual into a free-standing pivot Node2D
