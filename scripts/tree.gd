@@ -34,7 +34,10 @@ const VARIANTS: Array[Vector2i] = [
 # Cropped to 128x80 because the stump itself is small and the rest of that
 # cell region contains shadow ovals we don't want.
 const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
-const STUMP_OFFSET: Vector2 = Vector2(0, -25)  # places stump base at StaticBody origin
+# Aligns the stump's visual base with the original tree's shadow base (which
+# sat ~28 px below the StaticBody origin). Stump appears rooted where the tree
+# was, not floating above.
+const STUMP_OFFSET: Vector2 = Vector2(0, 3)
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
@@ -90,9 +93,9 @@ func complete_harvest() -> int:
 	if is_chopped:
 		return 0
 	is_chopped = true
-	# Stop colliding so hero can walk over the stump.
-	if collision != null:
-		collision.set_deferred("disabled", true)
+	# Collision intentionally NOT disabled — the stump remains as a solid
+	# obstacle. The trunk-base CircleShape2D is close enough to the stump's
+	# visual footprint that no shape change is needed.
 	_spawn_falling_log()
 	_swap_to_stump()
 	harvested.emit(WOOD_PER_HARVEST)

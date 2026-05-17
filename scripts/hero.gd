@@ -241,9 +241,12 @@ func _update_harvest(delta: float) -> void:
 	if _harvest_target.has_method("is_harvestable") and not _harvest_target.is_harvestable():
 		_cancel_harvest()
 		return
-	# Visual: re-play melee swing as a chop loop. Direction is locked from start.
-	if sprite.current_state() != &"melee":
-		sprite.play_state(&"melee")
+	# Visual: re-play melee swing as a chop loop. play_state() is safe to call
+	# every frame — its internal guard restarts the animation when it finishes
+	# (the melee animation has loop=false, so without this it'd freeze on the
+	# final frame after one swing and the knight would just stand still for
+	# the rest of the 3s).
+	sprite.play_state(&"melee")
 	_harvest_total_time += delta
 	# Per-tick visual: shake the tree.
 	if _harvest_total_time >= _next_harvest_tick_at:
