@@ -38,8 +38,8 @@ const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
 # Found empirically: changing sprite.offset had no visible effect (Godot
 # rendering quirk?), but sprite.position works. Collision and visual are
 # co-located so they read as one object.
-const STUMP_OFFSET: Vector2 = Vector2(0, 50)
-const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 50)
+const STUMP_OFFSET: Vector2 = Vector2(0, 40)
+const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 40)
 const STUMP_COLLISION_RADIUS: float = 10.0
 
 # Harvest tuning.
