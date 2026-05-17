@@ -34,10 +34,12 @@ const VARIANTS: Array[Vector2i] = [
 # Cropped to 128x80 because the stump itself is small and the rest of that
 # cell region contains shadow ovals we don't want.
 const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
-# Aligns the stump's visual base with the original tree's shadow base (which
-# sat ~28 px below the StaticBody origin). Stump appears rooted where the tree
-# was, not floating above.
-const STUMP_OFFSET: Vector2 = Vector2(0, 3)
+# Where the stump renders relative to the StaticBody origin. The stump
+# collision shape (set in complete_harvest) is co-located with this so
+# they read as the same physical object.
+const STUMP_OFFSET: Vector2 = Vector2(0, 15)
+const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 15)
+const STUMP_COLLISION_RADIUS: float = 8.0
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
@@ -93,9 +95,14 @@ func complete_harvest() -> int:
 	if is_chopped:
 		return 0
 	is_chopped = true
-	# Collision intentionally NOT disabled — the stump remains as a solid
-	# obstacle. The trunk-base CircleShape2D is close enough to the stump's
-	# visual footprint that no shape change is needed.
+	# Re-shape the collision to match the smaller stump footprint and move it
+	# to overlap the stump visual. Build a fresh CircleShape2D so we don't
+	# mutate the shared trunk shape that other Tree instances are still using.
+	if collision != null:
+		var stump_shape := CircleShape2D.new()
+		stump_shape.radius = STUMP_COLLISION_RADIUS
+		collision.shape = stump_shape
+		collision.position = STUMP_COLLISION_POSITION
 	_spawn_falling_log()
 	_swap_to_stump()
 	harvested.emit(WOOD_PER_HARVEST)
