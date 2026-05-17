@@ -69,6 +69,11 @@ func _process(_delta: float) -> void:
 # Subsequent grass clicks fire _input while _active is true and route through
 # _try_confirm. No suppression hacks needed.
 func _input(event: InputEvent) -> void:
+	# DIAGNOSTIC: log all mouse button events regardless of active state, so we
+	# can see whether the click is even reaching us. Remove after debugging.
+	if event is InputEventMouseButton:
+		var diag := event as InputEventMouseButton
+		print("[BuildPlacement] _input mouse button=", diag.button_index, " pressed=", diag.pressed, " active=", _active)
 	if not _active:
 		return
 	if not (event is InputEventMouseButton):
@@ -118,10 +123,14 @@ func _draw() -> void:
 # --- Input -------------------------------------------------------------------
 
 func _unhandled_input(event: InputEvent) -> void:
+	# DIAGNOSTIC: log mouse button events at this stage too. Remove after debugging.
+	if event is InputEventMouseButton:
+		var diag := event as InputEventMouseButton
+		print("[BuildPlacement] _unhandled_input mouse button=", diag.button_index, " pressed=", diag.pressed, " active=", _active)
 	if not _active:
 		return
 	if event.is_action_pressed("attack"):
-		print("[BuildPlacement] LMB received during placement at origin=", _origin_cell)
+		print("[BuildPlacement] (_unhandled_input) attack action received at origin=", _origin_cell)
 		_try_confirm()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("cancel"):
