@@ -24,6 +24,9 @@ const SAMPLE_TREE_POSITIONS: Array[Vector2] = [
 func _ready() -> void:
 	hero.add_to_group("hero")
 	add_to_group("grasslands")
+	# Exploration zoom — wider view than combat (2x) but tighter than build (0.6x).
+	if hero.has_node("Camera2D"):
+		(hero.get_node("Camera2D") as Camera2D).zoom = Vector2(1.5, 1.5)
 	for pos in SAMPLE_TREE_POSITIONS:
 		var t: Node2D = TREE_SCENE.instantiate()
 		t.position = pos
