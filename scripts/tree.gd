@@ -9,13 +9,14 @@ extends StaticBody2D
 ##
 
 const TREE_CELL_SIZE: Vector2i = Vector2i(128, 160)
-# Column/row of tree variants on pine-tree.png (4 cols x 4 rows of usable trees,
-# the top-right cell is a stump, last column is mostly shadow ovals).
+# Only rows 0-1 are used: those tree variants share the same trunk-base
+# alignment in their cells, so a single sprite offset roots them correctly.
+# Rows 2-3 contain progressively smaller trees positioned differently within
+# their cells — using them produced floating / stump-like artifacts.
+# The 4th column (cells 3,*) holds a stump + shadow ovals — also excluded.
 const VARIANTS: Array[Vector2i] = [
 	Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0),
 	Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1),
-	Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 2),
-	Vector2i(0, 3), Vector2i(1, 3), Vector2i(2, 3),
 ]
 
 @export var variant: int = 0
