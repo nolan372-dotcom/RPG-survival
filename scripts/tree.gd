@@ -43,10 +43,11 @@ const STUMP_COLLISION_POSITION: Vector2 = Vector2(0, 15)
 const STUMP_COLLISION_RADIUS: float = 10.0
 
 # Falling log: how much of the original tree's vertical extent is animated
-# when chopped. The full tree is 200px; we crop to just the upper foliage
-# section so the trunk + shadow don't appear to "pop out of the ground" and
-# fall — they're already replaced by the stump.
-const FALL_CROP_HEIGHT: int = 130
+# when chopped. Cut happens NEAR THE BASE — falling piece is the foliage +
+# trunk (top 160 px of the 200 px tree), and only the very bottom ~40 px
+# (shadow / stump area) is replaced by the static stump sprite. Reads as
+# "the tree was chopped at its base, the whole thing tips over."
+const FALL_CROP_HEIGHT: int = 160
 
 # Harvest tuning.
 const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
