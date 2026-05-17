@@ -276,7 +276,10 @@ func _spawn_resource_popup(at_node: Node2D, amount: int, kind: StringName) -> vo
 	if at_node == null:
 		return
 	var node: Node2D = dmg_number_scene.instantiate()
-	node.global_position = at_node.global_position + Vector2(0, -48)
+	# Anchor the popup just above the stump (not above the tree's StaticBody
+	# origin, which is well above the stump). Float-up animation will carry
+	# it up from there, drawing the eye to where the harvest landed.
+	node.global_position = at_node.global_position + Vector2(0, -8)
 	get_tree().current_scene.add_child(node)
 	if node.has_method("setup"):
 		node.setup(amount)
