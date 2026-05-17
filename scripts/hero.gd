@@ -11,7 +11,7 @@ extends CharacterBody2D
 ##   - Stalwart passive: -15% incoming damage when HP < 50%.
 ##
 
-enum State { IDLE, WALK, ATTACK, BLOCK_START, BLOCK_HOLD, HURT, DEAD }
+enum State { IDLE, WALK, ATTACK, BLOCK_START, BLOCK_HOLD, HURT, DEAD, HARVEST }
 
 signal hp_changed(current: int, max_hp: int)
 signal died
@@ -29,6 +29,7 @@ const HURT_LOCKOUT: float = 0.20
 const HIT_STOP_DURATION: float = 0.05
 const STALWART_HP_THRESHOLD: float = 0.5
 const STALWART_DAMAGE_REDUCTION: float = 0.15
+const HARVEST_TICK_INTERVAL: float = 0.5  # chop-tick visual feedback cadence
 
 # --- State --------------------------------------------------------------------
 var current_hp: int = 100
@@ -44,6 +45,11 @@ var _hit_targets_this_swing: Array[Node] = []
 # Gating flag — set true while UI modes (e.g. building placement) consume
 # attack/ability inputs. The hero still moves and faces the mouse.
 var input_locked: bool = false
+
+# Harvest state.
+var _harvest_target: Node = null
+var _harvest_total_time: float = 0.0
+var _next_harvest_tick_at: float = 0.0
 
 # --- Node refs ----------------------------------------------------------------
 @onready var sprite: HeroSpriteController = $Sprite
@@ -114,6 +120,10 @@ func _physics_process(delta: float) -> void:
 			move_and_slide()
 			if _state_timer >= HURT_LOCKOUT:
 				_enter_idle_or_walk()
+		State.HARVEST:
+			velocity = velocity.lerp(Vector2.ZERO, 20.0 * delta)
+			move_and_slide()
+			_update_harvest(delta)
 		State.DEAD:
 			velocity = Vector2.ZERO
 
@@ -143,6 +153,8 @@ func _check_action_inputs() -> void:
 		_enter_attack()
 	elif Input.is_action_just_pressed("ability") and _block_cooldown_remaining <= 0.0:
 		_enter_block_start()
+	elif Input.is_action_just_pressed("interact"):
+		_try_start_harvest()
 
 func _update_facing() -> void:
 	# Sprite facing always follows the mouse cursor, regardless of state.
@@ -187,6 +199,96 @@ func _enter_hurt() -> void:
 	_set_state(State.HURT)
 	_flash_modulate(Color(1.6, 0.4, 0.4), 0.12)
 
+# --- Harvest ----------------------------------------------------------------
+
+func _try_start_harvest() -> void:
+	var target: Node = _find_nearest_harvestable()
+	if target == null:
+		return
+	_harvest_target = target
+	_harvest_total_time = 0.0
+	_next_harvest_tick_at = 0.5
+	_set_state(State.HARVEST)
+	# Face the target while harvesting so the swing animation aims at it.
+	var dir: Vector2 = target.global_position - global_position
+	sprite.set_facing_from_aim(dir)
+
+func _find_nearest_harvestable() -> Node:
+	var best: Node = null
+	var best_dist: float = INF
+	for node in get_tree().get_nodes_in_group("harvestable"):
+		if not (node is Node2D):
+			continue
+		if node.has_method("is_harvestable") and not node.is_harvestable():
+			continue
+		var radius: float = 56.0
+		if "INTERACTION_RADIUS" in node:
+			radius = node.INTERACTION_RADIUS
+		var d: float = global_position.distance_to((node as Node2D).global_position)
+		if d <= radius and d < best_dist:
+			best = node
+			best_dist = d
+	return best
+
+func _update_harvest(delta: float) -> void:
+	# Cancel if hero released E, target died, or hero starts another action.
+	if not Input.is_action_pressed("interact"):
+		_cancel_harvest()
+		return
+	if _harvest_target == null or not is_instance_valid(_harvest_target):
+		_cancel_harvest()
+		return
+	if _harvest_target.has_method("is_harvestable") and not _harvest_target.is_harvestable():
+		_cancel_harvest()
+		return
+	# Visual: re-play melee swing as a chop loop. Direction is locked from start.
+	if sprite.current_state() != &"melee":
+		sprite.play_state(&"melee")
+	_harvest_total_time += delta
+	# Per-tick visual: shake the tree.
+	if _harvest_total_time >= _next_harvest_tick_at:
+		_next_harvest_tick_at += HARVEST_TICK_INTERVAL
+		if _harvest_target.has_method("tree_shake"):
+			_harvest_target.tree_shake()
+	# Done?
+	if _harvest_total_time >= TreeNode.HARVEST_TIME:
+		_complete_harvest()
+
+func _complete_harvest() -> void:
+	var target: Node = _harvest_target
+	_harvest_target = null
+	var wood: int = 0
+	if target != null and target.has_method("complete_harvest"):
+		wood = target.complete_harvest()
+	if wood > 0:
+		ResourceState.add(ResourceState.WOOD, wood)
+		_spawn_resource_popup(target as Node2D, wood, &"wood")
+	_enter_idle_or_walk()
+
+func _cancel_harvest() -> void:
+	_harvest_target = null
+	_enter_idle_or_walk()
+
+func _spawn_resource_popup(at_node: Node2D, amount: int, kind: StringName) -> void:
+	if at_node == null:
+		return
+	var node: Node2D = dmg_number_scene.instantiate()
+	node.global_position = at_node.global_position + Vector2(0, -48)
+	get_tree().current_scene.add_child(node)
+	if node.has_method("setup"):
+		node.setup(amount)
+	# The damage_number defaults to a cream tint; tint for resource type so it
+	# reads as a gain not a hit.
+	await get_tree().process_frame
+	if is_instance_valid(node) and node.has_node("Label"):
+		var label: Label = node.get_node("Label")
+		match kind:
+			&"wood":  label.modulate = Color(0.85, 0.65, 0.35)
+			&"food":  label.modulate = Color(0.85, 0.4, 0.4)
+			&"gold":  label.modulate = Color(1.0, 0.9, 0.35)
+			_:        label.modulate = Color(0.9, 0.9, 0.9)
+		label.text = "+%d %s" % [amount, String(kind)]
+
 func _enter_dead() -> void:
 	_set_state(State.DEAD)
 	_disable_attack_hitbox()
@@ -201,6 +303,7 @@ func _play_state_anim() -> void:
 		State.BLOCK_START: sprite.play_state(&"block_start")
 		State.BLOCK_HOLD: sprite.play_state(&"block_mid")
 		State.HURT: sprite.play_state(&"hurt")
+		State.HARVEST: sprite.play_state(&"melee")  # reuse melee swing as chop loop
 		State.DEAD: sprite.play_state(&"die")
 
 # --- Attack hitbox ------------------------------------------------------------

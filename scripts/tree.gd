@@ -5,7 +5,12 @@ extends StaticBody2D
 ## pine-tree.png via region_rect for visual variety. Collision is a small
 ## circle at the trunk so the hero can walk between trees comfortably.
 ##
-## Harvest interaction is wired up in C6 Chunk 3 (E to chop, time, drop wood).
+## Harvest flow (C6-S3):
+##   1. Hero stands within INTERACTION_RADIUS and holds E for HARVEST_TIME.
+##   2. tree_shake() fires on each chop tick (every 0.5s) for visual feedback.
+##   3. complete_harvest() swaps the sprite to the stump variant, spawns a
+##      "falling log" animation (rotates around the trunk base then fades),
+##      disables collision, and returns the wood amount.
 ##
 
 # Atlas geometry:
@@ -25,15 +30,39 @@ const VARIANTS: Array[Vector2i] = [
 	Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0),
 ]
 
+# Stump variant (top-right corner of pine-tree.png).
+# Cropped to 128x80 because the stump itself is small and the rest of that
+# cell region contains shadow ovals we don't want.
+const STUMP_REGION: Rect2 = Rect2(384, 0, 128, 80)
+const STUMP_OFFSET: Vector2 = Vector2(0, -25)  # places stump base at StaticBody origin
+
+# Harvest tuning.
+const HARVEST_TIME: float = 3.0       # seconds of held E to chop down
+const WOOD_PER_HARVEST: int = 5
+const INTERACTION_RADIUS: float = 56.0  # hero must be this close to start harvest
+const SHAKE_AMPLITUDE: float = 3.0
+
+signal harvested(wood_amount: int)
+
 @export var variant: int = 0
 @export var randomize_variant_on_ready: bool = true
 
 @onready var sprite: Sprite2D = $Sprite
+@onready var collision: CollisionShape2D = $CollisionShape2D
+
+var is_chopped: bool = false
+var _original_sprite_offset: Vector2
+
+func _enter_tree() -> void:
+	add_to_group("harvestable")
+	add_to_group("tree")
 
 func _ready() -> void:
 	if randomize_variant_on_ready:
 		variant = randi() % VARIANTS.size()
 	_apply_variant()
+	if sprite != null:
+		_original_sprite_offset = sprite.offset
 
 func _apply_variant() -> void:
 	if sprite == null:
@@ -41,3 +70,61 @@ func _apply_variant() -> void:
 	var v: Vector2i = VARIANTS[variant % VARIANTS.size()]
 	sprite.region_enabled = true
 	sprite.region_rect = Rect2(v.x * TREE_CELL_X, v.y * TREE_CELL_Y_STRIDE, TREE_CROP_W, TREE_CROP_H)
+
+
+# --- Harvest interaction ----------------------------------------------------
+
+func is_harvestable() -> bool:
+	return not is_chopped
+
+func tree_shake() -> void:
+	if is_chopped or sprite == null:
+		return
+	var origin: Vector2 = _original_sprite_offset
+	var t := create_tween()
+	t.tween_property(sprite, "offset", origin + Vector2(SHAKE_AMPLITUDE, 0), 0.04)
+	t.tween_property(sprite, "offset", origin - Vector2(SHAKE_AMPLITUDE, 0), 0.04)
+	t.tween_property(sprite, "offset", origin, 0.06)
+
+func complete_harvest() -> int:
+	if is_chopped:
+		return 0
+	is_chopped = true
+	# Stop colliding so hero can walk over the stump.
+	if collision != null:
+		collision.set_deferred("disabled", true)
+	_spawn_falling_log()
+	_swap_to_stump()
+	harvested.emit(WOOD_PER_HARVEST)
+	return WOOD_PER_HARVEST
+
+func _swap_to_stump() -> void:
+	if sprite == null:
+		return
+	sprite.offset = STUMP_OFFSET
+	sprite.region_rect = STUMP_REGION
+
+func _spawn_falling_log() -> void:
+	# Snapshot the original tree visual into a free-standing pivot Node2D
+	# positioned at this tree's trunk base, then tween-rotate it 90deg around
+	# the base so it visually falls to the right, fading out at the end.
+	var pivot := Node2D.new()
+	pivot.global_position = global_position
+
+	var log_sprite := Sprite2D.new()
+	log_sprite.texture = sprite.texture
+	log_sprite.region_enabled = true
+	var v: Vector2i = VARIANTS[variant % VARIANTS.size()]
+	log_sprite.region_rect = Rect2(v.x * TREE_CELL_X, v.y * TREE_CELL_Y_STRIDE, TREE_CROP_W, TREE_CROP_H)
+	log_sprite.offset = _original_sprite_offset
+	log_sprite.z_index = 1  # draw above the stump that replaces us
+
+	pivot.add_child(log_sprite)
+	# Add as sibling of this tree (under the same World container) so it
+	# y-sorts naturally alongside us.
+	get_parent().add_child(pivot)
+
+	var t := create_tween()
+	t.tween_property(pivot, "rotation", PI / 2.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_property(log_sprite, "modulate:a", 0.0, 0.3)
+	t.tween_callback(pivot.queue_free)

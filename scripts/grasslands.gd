@@ -21,6 +21,7 @@ extends Node2D
 @onready var zones_root: Node2D = $BiomeZones
 @onready var generator: BiomeGenerator = $BiomeGenerator
 @onready var seed_label: Label = $UI/SeedLabel
+@onready var resource_hud: Label = $UI/ResourceHUD
 
 var current_seed: int = 0
 
@@ -32,6 +33,8 @@ func _ready() -> void:
 	if hero.has_node("Camera2D"):
 		(hero.get_node("Camera2D") as Camera2D).zoom = Vector2(1.5, 1.5)
 	_regenerate(_pick_seed())
+	ResourceState.resources_changed.connect(_on_resources_changed)
+	_on_resources_changed(ResourceState.wood, ResourceState.food, ResourceState.gold)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -79,3 +82,10 @@ func _toggle_zone_debug() -> void:
 		if zone_node is BiomeZone:
 			(zone_node as BiomeZone).debug_draw = not (zone_node as BiomeZone).debug_draw
 			(zone_node as BiomeZone).queue_redraw()
+
+
+# --- Resource HUD ------------------------------------------------------------
+
+func _on_resources_changed(wood: int, food: int, gold: int) -> void:
+	if resource_hud != null:
+		resource_hud.text = "Wood:  %d\nFood:  %d\nGold:  %d" % [wood, food, gold]

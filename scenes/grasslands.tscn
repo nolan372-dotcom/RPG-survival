@@ -75,8 +75,8 @@ offset_bottom = 80.0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-text = "Grasslands — C6 prototype (Chunk 2: procgen trees)
-WASD walk.  G regenerate with new seed.  V toggle zone debug overlay.
+text = "Grasslands — C6 prototype (Chunk 3a: harvest)
+WASD walk.  Hold E near a tree to chop (3s).  G new seed.  V zones.
 F9 combat arena   F10 castle plot"
 
 [node name="SeedLabel" type="Label" parent="UI"]
@@ -89,3 +89,21 @@ theme_override_colors/font_color = Color(0.7, 0.95, 0.75, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "seed: -    trees: -"
+
+[node name="ResourceHUD" type="Label" parent="UI"]
+mouse_filter = 2
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = 90.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Wood:  0
+Food:  0
+Gold:  0"
+horizontal_alignment = 2
