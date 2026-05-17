@@ -25,11 +25,17 @@ func _ready() -> void:
 	_spawn_dummies()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		_clear_dummies()
-		_spawn_dummies()
-		hero.current_hp = hero.max_hp
-		hero.hp_changed.emit(hero.current_hp, hero.max_hp)
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_R:
+				_clear_dummies()
+				_spawn_dummies()
+				hero.current_hp = hero.max_hp
+				hero.hp_changed.emit(hero.current_hp, hero.max_hp)
+			KEY_F10:
+				get_tree().change_scene_to_file("res://scenes/castle_plot.tscn")
+			KEY_F11:
+				get_tree().change_scene_to_file("res://scenes/grasslands.tscn")
 
 func _spawn_dummies() -> void:
 	for spec in SPAWN_LAYOUT:
