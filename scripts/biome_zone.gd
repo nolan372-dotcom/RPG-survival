@@ -8,7 +8,7 @@ extends Node2D
 ## position. Add as children of a BiomeZones container in the biome scene.
 ##
 
-enum ContentKind { TREES, BERRIES, GOLD, ENEMY_CAMP }
+enum ContentKind { TREES, BERRIES, GOLD, ENEMY_CAMP, MINI_BOSS }
 
 @export var size: Vector2 = Vector2(800, 600)
 @export var content_kind: ContentKind = ContentKind.TREES

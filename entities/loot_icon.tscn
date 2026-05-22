@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1crownwall3002"]
+
+[ext_resource type="Script" path="res://scripts/loot_icon.gd" id="1_loot"]
+
+[node name="LootIcon" type="Node2D"]
+z_index = 100
+script = ExtResource("1_loot")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture_filter = 1

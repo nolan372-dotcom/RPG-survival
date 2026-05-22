@@ -257,26 +257,26 @@ All must be checked before proceeding to Vertical Slice.
 
 ### Story C6-S1: Biome generator
 
-- [ ] Define hand-crafted Grasslands base map (using Grasslands tileset)
-- [ ] Mark designer zones: where resource nodes can spawn, where enemy camps can spawn, where mini-boss spawns can spawn
-- [ ] Implement procedural placement algorithm (seeded random, biased toward biome rules)
-- [ ] Spawn resource nodes (trees, berry bushes) within zones
-- [ ] Spawn enemy camps within zones with composition from BiomeData
-- [ ] Spawn one mini-boss from biome pool at a designated spawn zone
+- [ ] Define hand-crafted Grasslands base map (using Grasslands tileset)  *(deferred — flat-green placeholder in use; tileset pass is next)*
+- [x] Mark designer zones: where resource nodes can spawn, where enemy camps can spawn, where mini-boss spawns can spawn
+- [x] Implement procedural placement algorithm (seeded random, biased toward biome rules)  *(biome_generator.gd — seeded rejection sampling)*
+- [x] Spawn resource nodes (trees, berry bushes) within zones  *(trees, berry bushes, and gold deposits)*
+- [x] Spawn enemy camps within zones with composition from BiomeData  *(camps spawn 2-6 goblins; headcount randomized, not yet BiomeData-driven)*
+- [x] Spawn one mini-boss from biome pool at a designated spawn zone  *(placeholder — scaled-up goblin)*
 
 ### Story C6-S2: Run-vs-run variation
 
-- [ ] Verify same biome, different seeds, produces different layouts
-- [ ] Visual debug: highlight zones, show density heat map
+- [x] Verify same biome, different seeds, produces different layouts  *(G key reseeds; layout differs per seed)*
+- [ ] Visual debug: highlight zones, show density heat map  *(zone-rect highlight done via V key; density heatmap not done)*
 - [ ] Document seed system in `/docs/procgen.md`
 
 ### Story C6-S3: Resource node interaction
 
-- [ ] Player interacts with tree → 3-second harvest animation
-- [ ] Resource VFX bursts from node
-- [ ] Resources arc to hero inventory
-- [ ] Node respawns after configured time (or stays consumed, TBD per node type)
-- [ ] Inventory UI shows wood/food/gold counts
+- [x] Player interacts with tree → 3-second harvest animation  *(hold E; berry forage 1.5s / gold mine 4s)*
+- [x] Resource VFX bursts from node  *(splinter / berry / gold particle bursts)*
+- [x] Resources arc to hero inventory  *(loot icons pop up from the node)*
+- [x] Node respawns after configured time (or stays consumed, TBD per node type)  *(consumed — tree → stump, bush → empty, gold → removed)*
+- [x] Inventory UI shows wood/food/gold counts  *(ResourceHUD)*
 
 ---
 

@@ -19,6 +19,7 @@ signal harvested(amount: int)
 
 @onready var sprite: Sprite2D = $Sprite
 @onready var collision: CollisionShape2D = $CollisionShape2D
+@onready var burst: CPUParticles2D = $Burst
 
 var is_picked: bool = false
 var _base_sprite_offset: Vector2 = Vector2.ZERO
@@ -49,6 +50,9 @@ func tree_shake() -> void:
 	t.tween_property(sprite, "offset", origin + Vector2(SHAKE_AMPLITUDE, 0), 0.04)
 	t.tween_property(sprite, "offset", origin - Vector2(SHAKE_AMPLITUDE, 0), 0.04)
 	t.tween_property(sprite, "offset", origin, 0.06)
+	if burst != null:
+		burst.restart()
+		burst.emitting = true
 
 func complete_harvest() -> int:
 	if is_picked:

@@ -25,8 +25,11 @@ const ATTACK_TOTAL_DURATION: float = 0.45   # total attack lockout duration
 const PARRY_WINDOW: float = 0.20            # 12 frames at 60fps — also the BLOCK_START duration
 const BLOCK_START_DURATION: float = PARRY_WINDOW
 const BLOCK_COOLDOWN: float = 0.35          # after exiting block, can't block again for this long
+const BLOCK_FRONT_MULT: float = 0.3         # damage taken blocking head-on (70% reduction)
+const BLOCK_SIDE_MULT: float = 0.6          # damage taken blocking from the sides (40% reduction)
 const HURT_LOCKOUT: float = 0.20
 const HIT_STOP_DURATION: float = 0.05
+const THIRD_HIT_DAMAGE_MULT: float = 1.3  # 3rd swing of the 1->2->3 cycle hits 30% harder
 const STALWART_HP_THRESHOLD: float = 0.5
 const STALWART_DAMAGE_REDUCTION: float = 0.15
 const HARVEST_TICK_INTERVAL: float = 0.5  # chop-tick visual feedback cadence
@@ -60,7 +63,13 @@ var _harvest_target_duration: float = 3.0
 @onready var hurt_box: Area2D = $HurtBox
 @onready var stalwart_aura: Sprite2D = $StalwartAura
 @onready var camera: Camera2D = $Camera2D
+@onready var health_bar: ProgressBar = $HealthBar
 @onready var dmg_number_scene: PackedScene = preload("res://entities/damage_number.tscn")
+@onready var loot_icon_scene: PackedScene = preload("res://entities/loot_icon.tscn")
+
+const ICON_WOOD: Texture2D = preload("res://art/ui/icons/wood.png")
+const ICON_FOOD: Texture2D = preload("res://art/ui/icons/food.png")
+const ICON_GOLD: Texture2D = preload("res://art/ui/icons/gold.png")
 
 # --- Lifecycle ----------------------------------------------------------------
 
@@ -74,13 +83,18 @@ func _ready() -> void:
 	current_hp = max_hp
 	base_damage = hero_data.base_damage
 	move_speed = hero_data.move_speed
-	sprite.animation_set = hero_data.animation_set
-	sprite.rebuild()
 	attack_hitbox.body_entered.connect(_on_attack_hitbox_body_entered)
 	attack_hitbox.monitoring = false
 	attack_collision.disabled = true
 	stalwart_aura.visible = false
+	hp_changed.connect(_on_hp_changed_update_bar)
 	hp_changed.emit(current_hp, max_hp)
+
+
+func _on_hp_changed_update_bar(current: int, maximum: int) -> void:
+	if health_bar != null:
+		health_bar.max_value = maximum
+		health_bar.value = current
 
 func _physics_process(delta: float) -> void:
 	_state_timer += delta
@@ -100,7 +114,10 @@ func _physics_process(delta: float) -> void:
 			if _state_timer >= ATTACK_HITBOX_DELAY + ATTACK_HITBOX_DURATION:
 				_disable_attack_hitbox()
 			if _state_timer >= ATTACK_TOTAL_DURATION:
-				_enter_idle_or_walk()
+				if not input_locked and Input.is_action_pressed("attack"):
+					_restart_attack()
+				else:
+					_enter_idle_or_walk()
 		State.BLOCK_START:
 			velocity = velocity.lerp(Vector2.ZERO, 12.0 * delta)
 			move_and_slide()
@@ -158,10 +175,14 @@ func _check_action_inputs() -> void:
 		_try_start_harvest()
 
 func _update_facing() -> void:
-	# Sprite facing always follows the mouse cursor, regardless of state.
+	# Sprite facing follows horizontal movement input (A/D), not the mouse —
+	# otherwise the 2-directional knight flip-flops as the cursor crosses over
+	# it while running. No horizontal input keeps the current facing.
+	var move_x: float = Input.get_axis("move_left", "move_right")
+	if absf(move_x) > 0.01:
+		sprite.set_facing_from_aim(Vector2(move_x, 0.0))
+	# Attack pivot still tracks the mouse so the swing hitbox aims where you click.
 	var aim_dir: Vector2 = get_global_mouse_position() - global_position
-	sprite.set_facing_from_aim(aim_dir)
-	# Attack pivot follows the same direction so the hitbox rotates with aim.
 	attack_pivot.rotation = aim_dir.angle()
 
 # --- State transitions --------------------------------------------------------
@@ -183,6 +204,15 @@ func _enter_attack() -> void:
 	_set_state(State.ATTACK)
 	_attack_hitbox_armed = true
 	_hit_targets_this_swing.clear()
+
+func _restart_attack() -> void:
+	# Chain into the next swing of the 1->2->3 combo without dropping to idle
+	# — used while the attack button is held.
+	_state_timer = 0.0
+	_attack_hitbox_armed = true
+	_disable_attack_hitbox()
+	_hit_targets_this_swing.clear()
+	sprite.advance_attack()
 
 func _enter_block_start() -> void:
 	_set_state(State.BLOCK_START)
@@ -253,11 +283,15 @@ func _update_harvest(delta: float) -> void:
 	# the rest of the 3s).
 	sprite.play_state(&"melee")
 	_harvest_total_time += delta
-	# Per-tick visual: shake the tree.
+	# Per-tick visual: shake the tree (or bush, or rock).
 	if _harvest_total_time >= _next_harvest_tick_at:
 		_next_harvest_tick_at += HARVEST_TICK_INTERVAL
 		if _harvest_target.has_method("tree_shake"):
 			_harvest_target.tree_shake()
+	# Continuous progress for harvestables that need it (e.g., the gold ore's
+	# 5-stage breakdown animation). Optional — only fires if the target opts in.
+	if _harvest_target.has_method("on_harvest_progress"):
+		_harvest_target.on_harvest_progress(_harvest_total_time, _harvest_target_duration)
 	# Done?
 	if _harvest_total_time >= _harvest_target_duration:
 		_complete_harvest()
@@ -281,27 +315,31 @@ func _cancel_harvest() -> void:
 	_enter_idle_or_walk()
 
 func _spawn_resource_popup(at_node: Node2D, amount: int, kind: StringName) -> void:
-	if at_node == null:
+	# Spawn one small icon per resource gained, hopping up from the node and
+	# fading. Three berries from a bush = three berry icons. Reads as "this
+	# is what I just picked up."
+	if at_node == null or amount <= 0:
 		return
-	var node: Node2D = dmg_number_scene.instantiate()
-	# Anchor the popup just above the stump (not above the tree's StaticBody
-	# origin, which is well above the stump). Float-up animation will carry
-	# it up from there, drawing the eye to where the harvest landed.
-	node.global_position = at_node.global_position + Vector2(0, -8)
-	get_tree().current_scene.add_child(node)
-	if node.has_method("setup"):
-		node.setup(amount)
-	# The damage_number defaults to a cream tint; tint for resource type so it
-	# reads as a gain not a hit.
-	await get_tree().process_frame
-	if is_instance_valid(node) and node.has_node("Label"):
-		var label: Label = node.get_node("Label")
-		match kind:
-			&"wood":  label.modulate = Color(0.85, 0.65, 0.35)
-			&"food":  label.modulate = Color(0.85, 0.4, 0.4)
-			&"gold":  label.modulate = Color(1.0, 0.9, 0.35)
-			_:        label.modulate = Color(0.9, 0.9, 0.9)
-		label.text = "+%d %s" % [amount, String(kind)]
+	var texture: Texture2D = _icon_for_kind(kind)
+	if texture == null:
+		return
+	var base_pos: Vector2 = at_node.global_position + Vector2(0, -8)
+	# Fan icons horizontally so they don't stack — small offset per index,
+	# centered on base_pos.
+	for i in range(amount):
+		var x_offset: float = (float(i) - (amount - 1) * 0.5) * 5.0
+		var icon: Node2D = loot_icon_scene.instantiate()
+		icon.global_position = base_pos + Vector2(x_offset, 0)
+		get_tree().current_scene.add_child(icon)
+		if icon.has_method("setup"):
+			icon.setup(texture)
+
+func _icon_for_kind(kind: StringName) -> Texture2D:
+	match kind:
+		&"wood": return ICON_WOOD
+		&"food": return ICON_FOOD
+		&"gold": return ICON_GOLD
+	return null
 
 func _enter_dead() -> void:
 	_set_state(State.DEAD)
@@ -337,7 +375,10 @@ func _on_attack_hitbox_body_entered(body: Node) -> void:
 	if not body.has_method("take_damage"):
 		return
 	_hit_targets_this_swing.append(body)
-	body.take_damage(base_damage, self)
+	var dmg: int = base_damage
+	if sprite.current_attack_index() == 2:  # 3rd swing in the cycle
+		dmg = int(round(base_damage * THIRD_HIT_DAMAGE_MULT))
+	body.take_damage(dmg, self)
 	_apply_hit_stop()
 
 func _apply_hit_stop() -> void:
@@ -370,15 +411,16 @@ func take_damage(amount: int, _source: Node = null, from_dir: Vector2 = Vector2.
 		_enter_hurt()
 
 func _block_multiplier(from_dir: Vector2) -> float:
-	# Block: 0% from front, 50% from sides, 100% from back.
+	# Block reduces damage but never fully negates it — fully negating a hit
+	# is the parry's reward. Front: 70% reduction. Sides: 40%. Back: none.
 	if from_dir.length_squared() < 0.0001:
-		return 0.0  # treat ambient damage as blocked from front
+		return BLOCK_FRONT_MULT  # treat ambient damage as blocked from front
 	var aim_dir: Vector2 = (get_global_mouse_position() - global_position).normalized()
 	var dot: float = aim_dir.dot(-from_dir.normalized())  # +1 = blocked head-on, -1 = back-hit
 	if dot > 0.5:
-		return 0.0
+		return BLOCK_FRONT_MULT
 	elif dot > -0.5:
-		return 0.5
+		return BLOCK_SIDE_MULT
 	return 1.0
 
 func _parry(attacker: Node) -> void:

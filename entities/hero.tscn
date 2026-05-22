@@ -34,8 +34,9 @@ position = Vector2(0, 6)
 shape = SubResource("CircleShape2D_body")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
 script = ExtResource("2_sprite")
-offset = Vector2(0, -8)
+offset = Vector2(0, -4)
 
 [node name="StalwartAura" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.7)
@@ -55,6 +56,15 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackPivot/AttackHitbox"]
 shape = SubResource("RectangleShape2D_attack")
 disabled = true
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+offset_left = -22.0
+offset_top = -46.0
+offset_right = 22.0
+offset_bottom = -40.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
 
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 4

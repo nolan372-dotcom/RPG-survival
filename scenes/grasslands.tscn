@@ -91,6 +91,25 @@ min_count = 2
 max_count = 4
 min_separation = 100.0
 
+[node name="EnemyCampZone" type="Node2D" parent="BiomeZones"]
+position = Vector2(300, 350)
+script = ExtResource("4_zone")
+size = Vector2(500, 400)
+content_kind = 3
+min_count = 2
+max_count = 3
+min_separation = 220.0
+clearance_radius = 250.0
+
+[node name="MiniBossZone" type="Node2D" parent="BiomeZones"]
+position = Vector2(0, -850)
+script = ExtResource("4_zone")
+size = Vector2(500, 250)
+content_kind = 4
+min_count = 1
+max_count = 1
+min_separation = 100.0
+
 [node name="BiomeGenerator" type="Node" parent="."]
 script = ExtResource("5_gen")
 
@@ -111,8 +130,8 @@ offset_bottom = 80.0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
-text = "Grasslands — C6 prototype (Chunk 3b: berries + gold)
-WASD walk.  Hold E near a tree (chop, 3s) / bush (forage, 1.5s) / rock (mine, 4s).
+text = "Grasslands — C6 prototype (Chunk 4: enemy camps + mini-boss)
+WASD walk.  Hold E to harvest.  LMB attack / RMB block enemies.
 G new seed.  V zones.   F9 combat arena   F10 castle plot"
 
 [node name="SeedLabel" type="Label" parent="UI"]
@@ -143,3 +162,51 @@ text = "Wood:  0
 Food:  0
 Gold:  0"
 horizontal_alignment = 2
+
+[node name="DeathScreen" type="ColorRect" parent="UI"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="UI/DeathScreen"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -72.0
+offset_right = 240.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.9, 0.2, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 52
+text = "YOU DIED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Prompt" type="Label" parent="UI/DeathScreen"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = 18.0
+offset_right = 240.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "Press R to restart"
+horizontal_alignment = 1
+vertical_alignment = 1

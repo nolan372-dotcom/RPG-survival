@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://b3be63xlfdvxb"]
+
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://scripts/enemy_sprite_controller.gd" id="2_sprite"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_boss"]
+radius = 20.0
+
+[node name="MiniBoss" type="CharacterBody2D" groups=["enemy", "mini_boss"]]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_enemy")
+max_hp = 200
+move_speed = 45.0
+attack_damage = 18
+attack_interval = 2.0
+attack_range = 40.0
+aggro_radius = 210.0
+leash_radius = 420.0
+drop_kind = &"gold"
+drop_amount = 12
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 8)
+shape = SubResource("CircleShape2D_boss")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(1.6, 1.6)
+script = ExtResource("2_sprite")
+
+[node name="HPBar" type="ProgressBar" parent="."]
+offset_left = -34.0
+offset_top = -54.0
+offset_right = 34.0
+offset_bottom = -46.0
+max_value = 200.0
+value = 200.0
+show_percentage = false

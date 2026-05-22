@@ -18,6 +18,8 @@ extends Node
 const TREE_SCENE: PackedScene = preload("res://entities/tree.tscn")
 const BERRY_BUSH_SCENE: PackedScene = preload("res://entities/berry_bush.tscn")
 const GOLD_DEPOSIT_SCENE: PackedScene = preload("res://entities/gold_deposit.tscn")
+const ENEMY_CAMP_SCENE: PackedScene = preload("res://entities/enemy_camp.tscn")
+const MINI_BOSS_SCENE: PackedScene = preload("res://entities/mini_boss.tscn")
 
 ## Returns total entities placed across all zones.
 func populate(
@@ -97,5 +99,8 @@ func _spawn_for(kind: int) -> Node2D:
 			return BERRY_BUSH_SCENE.instantiate()
 		BiomeZone.ContentKind.GOLD:
 			return GOLD_DEPOSIT_SCENE.instantiate()
-		# BiomeZone.ContentKind.ENEMY_CAMP -- wired in Chunk 4.
+		BiomeZone.ContentKind.ENEMY_CAMP:
+			return ENEMY_CAMP_SCENE.instantiate()
+		BiomeZone.ContentKind.MINI_BOSS:
+			return MINI_BOSS_SCENE.instantiate()
 	return null
