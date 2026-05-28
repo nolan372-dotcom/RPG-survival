@@ -32,10 +32,10 @@ func _ready() -> void:
 	hero.add_to_group("hero")
 	add_to_group("grasslands")
 	hero.died.connect(_on_hero_died)
-	# Exploration uses the same 2x zoom as combat — pixel art needs a
-	# whole-number zoom or it shimmers/blurs while the camera moves.
+	# Exploration uses 1x zoom — a wide field of view. Whole-number zoom
+	# keeps pixel art crisp; 1x is the widest crisp option.
 	if hero.has_node("Camera2D"):
-		(hero.get_node("Camera2D") as Camera2D).zoom = Vector2(2, 2)
+		(hero.get_node("Camera2D") as Camera2D).zoom = Vector2(1, 1)
 	_regenerate(_pick_seed())
 	ResourceState.resources_changed.connect(_on_resources_changed)
 	_on_resources_changed(ResourceState.wood, ResourceState.food, ResourceState.gold)

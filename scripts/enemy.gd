@@ -29,6 +29,7 @@ const ICON_FOOD: Texture2D = preload("res://art/ui/icons/food.png")
 const ICON_GOLD: Texture2D = preload("res://art/ui/icons/gold.png")
 const HOME_ARRIVE_DIST: float = 8.0
 const ATTACK_EXIT_BUFFER: float = 14.0    # hysteresis: stay in ATTACK until the hero is clearly out of range
+const ATTACK_WINDUP: float = 0.45         # delay from swing start to the hit landing (matches the strike frame)
 const WANDER_SPEED: float = 22.0          # slow amble while idling at camp
 const WANDER_PAUSE_MIN: float = 0.8
 const WANDER_PAUSE_MAX: float = 2.6
@@ -141,7 +142,7 @@ func _update_ai(delta: float) -> void:
 				_attack_timer += delta
 				if _attack_timer >= attack_interval:
 					_attack_timer = 0.0
-					_swing_at(hero as Node2D)
+					_start_swing(hero as Node2D)
 		State.RETURN:
 			if hero_valid and dist_to_hero <= aggro_radius and _has_los_to(hero as Node2D):
 				state = State.CHASE
@@ -153,14 +154,27 @@ func _update_ai(delta: float) -> void:
 			velocity = Vector2.ZERO
 
 
-func _swing_at(hero: Node2D) -> void:
+func _start_swing(hero: Node2D) -> void:
 	if hero == null or not is_instance_valid(hero):
 		return
-	if global_position.distance_to(hero.global_position) > attack_range + 8.0:
-		return
 	sprite.play_state(&"attack")  # facing is handled each frame by _update_sprite
-	var from_dir: Vector2 = (hero.global_position - global_position).normalized()
+	# The hit lands partway through the swing — not on frame 0 — so the damage
+	# matches the moment the goblin's weapon visually connects.
+	get_tree().create_timer(ATTACK_WINDUP).timeout.connect(_land_hit)
+
+
+func _land_hit() -> void:
+	if state == State.DEAD:
+		return
+	var hero: Node = get_tree().get_first_node_in_group("hero")
+	if hero == null or not is_instance_valid(hero):
+		return
+	var hero_2d: Node2D = hero as Node2D
+	# If the hero slipped out of range during the wind-up, the swing whiffs.
+	if global_position.distance_to(hero_2d.global_position) > attack_range + 12.0:
+		return
 	if hero.has_method("take_damage"):
+		var from_dir: Vector2 = (hero_2d.global_position - global_position).normalized()
 		hero.take_damage(attack_damage, self, from_dir)
 
 

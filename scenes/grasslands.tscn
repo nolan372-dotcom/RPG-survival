@@ -1,53 +1,52 @@
-[gd_scene load_steps=5 format=3 uid="uid://b3be63xleovwa"]
+[gd_scene format=3 uid="uid://b3be63xleovwa"]
 
-[ext_resource type="Script" path="res://scripts/grasslands.gd" id="1_grass"]
-[ext_resource type="Texture2D" path="res://art/biomes/grasslands/grass_tile_32.png" id="2_grass_tile"]
-[ext_resource type="PackedScene" path="res://entities/hero.tscn" id="3_hero"]
-[ext_resource type="Script" path="res://scripts/biome_zone.gd" id="4_zone"]
-[ext_resource type="Script" path="res://scripts/biome_generator.gd" id="5_gen"]
+[ext_resource type="Script" uid="uid://bg8yhlndxs1qn" path="res://scripts/grasslands.gd" id="1_grass"]
+[ext_resource type="Texture2D" uid="uid://c2ms0nn2mowbs" path="res://art/biomes/grasslands/grass_ground.png" id="2_grass_tile"]
+[ext_resource type="PackedScene" uid="uid://b3be63xlfdvwa" path="res://entities/hero.tscn" id="3_hero"]
+[ext_resource type="Script" uid="uid://vngfq4xoqhn6" path="res://scripts/biome_zone.gd" id="4_zone"]
+[ext_resource type="Script" uid="uid://ckdq313s2hv2i" path="res://scripts/biome_generator.gd" id="5_gen"]
+[ext_resource type="TileSet" path="res://art/biomes/grasslands/grasslands_tileset.tres" id="6_tileset"]
+[ext_resource type="Texture2D" uid="uid://dt40mjn2ieylo" path="res://art/biomes/grasslands/map_mockup_underlay.png" id="7_underlay"]
 
-[node name="Grasslands" type="Node2D"]
+[node name="Grasslands" type="Node2D" unique_id=2050377264]
 script = ExtResource("1_grass")
 
-[node name="Ground" type="TextureRect" parent="."]
+[node name="Ground" type="TextureRect" parent="." unique_id=336202401]
 texture_repeat = 2
 offset_left = -2000.0
 offset_top = -2000.0
 offset_right = 2000.0
 offset_bottom = 2000.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
 mouse_filter = 2
 texture = ExtResource("2_grass_tile")
 stretch_mode = 1
-size_flags_horizontal = 0
-size_flags_vertical = 0
 
-[node name="BiomeZones" type="Node2D" parent="."]
+[node name="BiomeZones" type="Node2D" parent="." unique_id=812088787]
 
-[node name="ZoneNorth" type="Node2D" parent="BiomeZones"]
+[node name="ZoneNorth" type="Node2D" parent="BiomeZones" unique_id=402086676]
 position = Vector2(0, -500)
 script = ExtResource("4_zone")
 size = Vector2(1000, 500)
 min_count = 14
-max_count = 22
 min_separation = 140.0
 
-[node name="ZoneEast" type="Node2D" parent="BiomeZones"]
+[node name="ZoneEast" type="Node2D" parent="BiomeZones" unique_id=555827173]
 position = Vector2(700, 0)
 script = ExtResource("4_zone")
 size = Vector2(600, 700)
-min_count = 12
 max_count = 18
 min_separation = 140.0
 
-[node name="ZoneWest" type="Node2D" parent="BiomeZones"]
+[node name="ZoneWest" type="Node2D" parent="BiomeZones" unique_id=59103273]
 position = Vector2(-700, 0)
 script = ExtResource("4_zone")
 size = Vector2(600, 700)
-min_count = 12
 max_count = 18
 min_separation = 140.0
 
-[node name="ZoneSouth" type="Node2D" parent="BiomeZones"]
+[node name="ZoneSouth" type="Node2D" parent="BiomeZones" unique_id=1906425417]
 position = Vector2(0, 500)
 script = ExtResource("4_zone")
 size = Vector2(1000, 500)
@@ -55,7 +54,7 @@ min_count = 10
 max_count = 16
 min_separation = 140.0
 
-[node name="BerryZoneEastMid" type="Node2D" parent="BiomeZones"]
+[node name="BerryZoneEastMid" type="Node2D" parent="BiomeZones" unique_id=1605342464]
 position = Vector2(400, -150)
 script = ExtResource("4_zone")
 size = Vector2(500, 400)
@@ -64,7 +63,7 @@ min_count = 5
 max_count = 9
 min_separation = 60.0
 
-[node name="BerryZoneSouthWest" type="Node2D" parent="BiomeZones"]
+[node name="BerryZoneSouthWest" type="Node2D" parent="BiomeZones" unique_id=1987284932]
 position = Vector2(-400, 250)
 script = ExtResource("4_zone")
 size = Vector2(500, 400)
@@ -73,7 +72,7 @@ min_count = 4
 max_count = 8
 min_separation = 60.0
 
-[node name="GoldZoneFarWest" type="Node2D" parent="BiomeZones"]
+[node name="GoldZoneFarWest" type="Node2D" parent="BiomeZones" unique_id=507778259]
 position = Vector2(-850, -200)
 script = ExtResource("4_zone")
 size = Vector2(400, 500)
@@ -82,7 +81,7 @@ min_count = 2
 max_count = 4
 min_separation = 100.0
 
-[node name="GoldZoneFarEast" type="Node2D" parent="BiomeZones"]
+[node name="GoldZoneFarEast" type="Node2D" parent="BiomeZones" unique_id=1508445133]
 position = Vector2(850, 250)
 script = ExtResource("4_zone")
 size = Vector2(400, 500)
@@ -91,7 +90,7 @@ min_count = 2
 max_count = 4
 min_separation = 100.0
 
-[node name="EnemyCampZone" type="Node2D" parent="BiomeZones"]
+[node name="EnemyCampZone" type="Node2D" parent="BiomeZones" unique_id=755838577]
 position = Vector2(300, 350)
 script = ExtResource("4_zone")
 size = Vector2(500, 400)
@@ -101,7 +100,7 @@ max_count = 3
 min_separation = 220.0
 clearance_radius = 250.0
 
-[node name="MiniBossZone" type="Node2D" parent="BiomeZones"]
+[node name="MiniBossZone" type="Node2D" parent="BiomeZones" unique_id=2109720280]
 position = Vector2(0, -850)
 script = ExtResource("4_zone")
 size = Vector2(500, 250)
@@ -110,19 +109,29 @@ min_count = 1
 max_count = 1
 min_separation = 100.0
 
-[node name="BiomeGenerator" type="Node" parent="."]
+[node name="BiomeGenerator" type="Node" parent="." unique_id=301480442]
 script = ExtResource("5_gen")
 
-[node name="World" type="Node2D" parent="."]
+[node name="Map" type="Node2D" parent="." unique_id=200258924]
+
+[node name="Reference" type="Sprite2D" parent="Map" unique_id=1077409450]
+modulate = Color(1, 1, 1, 0.55)
+texture_filter = 1
+texture = ExtResource("7_underlay")
+
+[node name="TileMap" type="TileMapLayer" parent="Map" unique_id=1792625499]
+texture_filter = 1
+tile_map_data = PackedByteArray(0, 0, 37, 0, 252, 255, 0, 0, 21, 0, 46, 0, 0, 0, 37, 0, 251, 255, 0, 0, 21, 0, 46, 0, 0, 0)
+tile_set = ExtResource("6_tileset")
+
+[node name="World" type="Node2D" parent="." unique_id=1971074060]
 y_sort_enabled = true
 
-[node name="Hero" parent="World" instance=ExtResource("3_hero")]
-position = Vector2(0, 0)
+[node name="Hero" parent="World" unique_id=55639314 instance=ExtResource("3_hero")]
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1498442128]
 
-[node name="Instructions" type="Label" parent="UI"]
-mouse_filter = 2
+[node name="Instructions" type="Label" parent="UI" unique_id=1441105904]
 offset_left = 12.0
 offset_top = 12.0
 offset_right = 900.0
@@ -134,8 +143,7 @@ text = "Grasslands — C6 prototype (Chunk 4: enemy camps + mini-boss)
 WASD walk.  Hold E to harvest.  LMB attack / RMB block enemies.
 G new seed.  V zones.   F9 combat arena   F10 castle plot"
 
-[node name="SeedLabel" type="Label" parent="UI"]
-mouse_filter = 2
+[node name="SeedLabel" type="Label" parent="UI" unique_id=662756117]
 offset_left = 12.0
 offset_top = 92.0
 offset_right = 900.0
@@ -145,8 +153,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 text = "seed: -    trees: -"
 
-[node name="ResourceHUD" type="Label" parent="UI"]
-mouse_filter = 2
+[node name="ResourceHUD" type="Label" parent="UI" unique_id=1327975327]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -163,16 +170,18 @@ Food:  0
 Gold:  0"
 horizontal_alignment = 2
 
-[node name="DeathScreen" type="ColorRect" parent="UI"]
+[node name="DeathScreen" type="ColorRect" parent="UI" unique_id=420764127]
 visible = false
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.65)
 mouse_filter = 2
+color = Color(0, 0, 0, 0.65)
 
-[node name="Title" type="Label" parent="UI/DeathScreen"]
+[node name="Title" type="Label" parent="UI/DeathScreen" unique_id=1769347074]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -183,7 +192,6 @@ offset_right = 240.0
 offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.9, 0.2, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
@@ -192,7 +200,8 @@ text = "YOU DIED"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Prompt" type="Label" parent="UI/DeathScreen"]
+[node name="Prompt" type="Label" parent="UI/DeathScreen" unique_id=877757354]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -203,7 +212,6 @@ offset_right = 240.0
 offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.95, 0.95, 0.85, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4

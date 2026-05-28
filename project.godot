@@ -13,7 +13,7 @@ config_version=5
 config/name="Crown & Wall"
 config/description="A single-player action-strategy game: explore, prepare, and endure three escalating Sieges."
 config/version="0.0.1"
-run/main_scene="res://scenes/grasslands.tscn"
+run/main_scene="uid://b3be63xleovwa"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

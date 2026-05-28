@@ -33,3 +33,7 @@ user_mods/
 # Logs / crash dumps
 *.log
 logs/
+
+# Stray/accidental output
+System.Drawing.Bitmap
+/GDScript/
